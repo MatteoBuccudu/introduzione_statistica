@@ -68,8 +68,9 @@
       }
       html {
         scroll-padding-top: 84px;
-        scroll-behavior: smooth;
       }
+      html.lenis, html.lenis body { height: auto; }
+      .lenis.lenis-smooth { scroll-behavior: auto !important; }
       body {
         background: var(--bg);
         color: var(--ink);
@@ -1347,31 +1348,6 @@
       }
 
       /* ===== anelli di testo 3D ===== */
-      .ring3d {
-        height: clamp(220px, 32vw, 380px);
-        perspective: 1000px;
-        display: grid;
-        place-items: center;
-        overflow: hidden;
-        position: relative;
-        z-index: 2;
-      }
-      .ring3d .cyl {
-        position: relative;
-        width: 0;
-        height: 0;
-        transform-style: preserve-3d;
-      }
-      .ring3d .cyl span {
-        position: absolute;
-        left: 0;
-        top: 0;
-        font-family: var(--f-display);
-        font-size: clamp(3rem, 7.5vw, 6.4rem);
-        line-height: 1;
-        white-space: pre;
-      }
-
       /* ===== lettere estruse ===== */
       .x3d {
         position: absolute;
@@ -1426,8 +1402,14 @@
       }
       .split .ch {
         display: inline-block;
-        transform-origin: 50% 100%;
-        backface-visibility: hidden;
+        will-change: transform;
+      }
+      /* maschera: le lettere salgono da sotto la linea, senza ribaltarsi */
+      .split .w {
+        overflow: clip;
+        vertical-align: top;
+        padding: 0.08em 0.06em;
+        margin: -0.08em -0.06em;
       }
 
       /* ===== card in prospettiva ===== */
@@ -1554,13 +1536,128 @@
           height: 300vh;
         }
       }
+
+      /* ===== simulatore ===== */
+      .sim { display: grid; gap: 22px; }
+      .sim-form { display: flex; flex-wrap: wrap; gap: 10px; }
+      .sim-form input {
+        flex: 1 1 240px;
+        font: inherit;
+        font-family: var(--f-mono);
+        padding: 12px 18px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--glass);
+        color: var(--ink);
+      }
+      .sim-form input:focus-visible { outline: 2px solid var(--c2); outline-offset: 2px; }
+      .sim-hint { font-family: var(--f-mono); font-size: 0.78rem; color: var(--dim); }
+      .sim-hint.err { color: var(--warn); }
+      .sim-chips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 2.3rem; align-items: center; }
+      .sim-chips button {
+        font-family: var(--f-mono);
+        font-size: 0.85rem;
+        padding: 5px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--glass);
+        color: var(--ink);
+        cursor: pointer;
+        animation: chipin 0.45s var(--ease);
+      }
+      .sim-chips button:hover { border-color: var(--warn); color: var(--warn); }
+      @keyframes chipin { from { opacity: 0; transform: translateY(8px) scale(0.9); } }
+      .sim-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 12px; }
+      .sim-stat { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; background: var(--glass); }
+      .sim-stat span { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+      .sim-stat b { display: block; font-family: var(--f-display); font-weight: 400; font-size: 2.1rem; line-height: 1.1; overflow-wrap: anywhere; }
+      .sim-stat.hl b { color: var(--c2); }
+      .sim-bars { display: flex; gap: 14px; height: 250px; overflow-x: auto; padding: 26px 26px 4px 6px; }
+      .sim-bar { flex: 1 0 34px; display: grid; grid-template-rows: 1fr auto auto; justify-items: center; gap: 4px; font-family: var(--f-mono); font-size: 0.75rem; color: var(--muted); }
+      .sim-bar { --d: 24px; }
+      .sim-bar i {
+        position: relative;
+        align-self: end;
+        width: 100%;
+        height: var(--h);
+        background: linear-gradient(var(--c1), var(--c4));
+        transform: perspective(700px) rotateX(-14deg) rotateY(-26deg);
+        transform-style: preserve-3d;
+        transition: height 0.7s var(--ease);
+      }
+      .sim-bar i::before,
+      .sim-bar i::after {
+        content: "";
+        position: absolute;
+        background: inherit;
+      }
+      /* faccia superiore */
+      .sim-bar i::before {
+        left: 0; top: 0; width: 100%; height: var(--d);
+        transform-origin: 50% 0;
+        transform: rotateX(-90deg);
+        filter: brightness(1.3);
+      }
+      /* faccia laterale */
+      .sim-bar i::after {
+        right: 0; top: 0; height: 100%; width: var(--d);
+        transform-origin: 100% 50%;
+        transform: rotateY(-90deg);
+        filter: brightness(0.62);
+      }
+      .sim-stat { transition: transform 0.5s var(--ease), border-color 0.3s; }
+      .sim-stat:hover { transform: perspective(600px) translateY(-4px) rotateX(8deg); border-color: var(--c2); }
+      .sim-bar.mode i { background: linear-gradient(var(--c2), var(--c2)); }
+      .sim-bar em { font-style: normal; color: var(--ink); }
+      .sim-empty { color: var(--dim); font-family: var(--f-mono); font-size: 0.85rem; align-self: center; }
       @media (prefers-reduced-motion: reduce) {
+        .sim-chips button { animation: none; }
+        .sim-bar i, .sim-stat { transition: none; }
         .scroll-cue i::after {
           animation: none;
         }
         .flip .in,
         .card.tilt {
           transition: none;
+        }
+      }
+      /* ===== tema chiaro automatico ===== */
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f5f6fa;
+          --glass: rgba(255, 255, 255, 0.78);
+          --line: rgba(30, 45, 90, 0.16);
+          --ink: #11141c;
+          --muted: #424a60;
+          --dim: #6b7388;
+          --c1: #2950b8;
+          --c2: #b35f0d;
+          --c3: #0f7a5a;
+          --c4: #6a3fb5;
+          --warn: #b3261e;
+          color-scheme: light;
+        }
+        strong { color: var(--ink); }
+        .l0, .l1, .l2, .l3, .l4 {
+          background:
+            radial-gradient(60% 55% at 80% 20%, rgba(255, 174, 94, 0.22), transparent 70%),
+            radial-gradient(55% 55% at 12% 80%, rgba(107, 152, 255, 0.22), transparent 70%),
+            linear-gradient(170deg, #fbfcff, #eef1f8 70%);
+        }
+        .grain { opacity: 0.03; mix-blend-mode: multiply; }
+        nav.top { background: rgba(245, 246, 250, 0.78); }
+        .formula, .btn { background: rgba(255, 255, 255, 0.7); }
+        .part-head .ghost { -webkit-text-stroke-color: rgba(30, 45, 90, 0.16); }
+        .warn {
+          background: linear-gradient(135deg, rgba(255, 123, 110, 0.14), rgba(255, 255, 255, 0.78) 60%);
+        }
+        .flip .b {
+          background: linear-gradient(135deg, rgba(255, 174, 94, 0.28), rgba(255, 255, 255, 0.96) 70%);
+        }
+        .hero3d .shade {
+          background:
+            linear-gradient(90deg, rgba(245, 246, 250, 0.92) 0%, rgba(245, 246, 250, 0.5) 42%, transparent 68%),
+            linear-gradient(0deg, rgba(245, 246, 250, 0.85), transparent 42%);
         }
       }
       @media print {
@@ -1666,7 +1763,8 @@
           ><a href="#sez-a" data-sec="sez-a">A · Frequenze</a
           ><a href="#sez-b" data-sec="sez-b">B · Media, mediana, moda</a
           ><a href="#sez-c" data-sec="sez-c">C · Grafici</a
-          ><a href="#riepilogo" data-sec="riepilogo">Riepilogo</a>
+          ><a href="#sim" data-sec="sim">Simulatore</a
+        ><a href="#riepilogo" data-sec="riepilogo">Riepilogo</a>
         </div>
       </nav>
 
@@ -1739,12 +1837,6 @@
           </ol>
         </div>
       </section>
-      <div
-        class="ring3d"
-        aria-hidden="true"
-        data-text="MEDIA · MEDIANA · MODA · FREQUENZE · GRAFICI · "
-      ></div>
-
       <main class="wrap">
         <!-- ================= PRIMA DI INIZIARE ================= -->
         <section class="part" id="inizio" data-bg="0">
@@ -2872,11 +2964,45 @@
           </div>
         </section>
 
-        <div
-          class="ring3d"
-          aria-hidden="true"
-          data-text="CONTA · RIASSUMI · DISEGNA · CONTA · RIASSUMI · DISEGNA · "
-        ></div>
+        <!-- ================= SIMULATORE ================= -->
+        <section class="part" id="sim" data-bg="2">
+          <div class="part-head">
+            <div class="eyebrow rv">Simulatore</div>
+            <h2 class="split">Prova con i <em class="s">tuoi dati</em></h2>
+            <p class="lead rv">
+              Scrivi un numero e premi Invio: a ogni dato che aggiungi, le
+              statistiche si aggiornano da sole. Puoi incollare anche più
+              numeri insieme, separati da spazio o punto e virgola.
+            </p>
+          </div>
+          <div class="card sim rv">
+            <form class="sim-form" id="sim-form" autocomplete="off">
+              <input id="sim-in" inputmode="decimal" aria-label="Nuovo dato" placeholder="Es. 12 oppure 7,5" />
+              <button class="btn" type="submit">Aggiungi</button>
+              <button class="btn" type="button" id="sim-ex">Esempio</button>
+              <button class="btn" type="button" id="sim-clear">Azzera</button>
+            </form>
+            <div class="sim-hint" id="sim-msg" role="status">Clicca un dato per rimuoverlo. Decimali con la virgola.</div>
+            <div class="sim-chips" id="sim-chips" aria-label="Dati inseriti"></div>
+            <div class="sim-stats" id="sim-stats" aria-live="polite"></div>
+            <div class="sim-bars" id="sim-bars" role="img" aria-label="Grafico delle frequenze"></div>
+            <div class="tbl">
+              <table>
+                <caption>Tabella delle frequenze</caption>
+                <thead>
+                  <tr>
+                    <th>Valore</th>
+                    <th>nᵢ<small>quanti</small></th>
+                    <th>fᵢ<small>quota</small></th>
+                    <th>pᵢ %<small>percentuale</small></th>
+                    <th>Nᵢ<small>fino a qui</small></th>
+                  </tr>
+                </thead>
+                <tbody id="sim-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
 
         <!-- ================= RIEPILOGO ================= -->
         <section class="part" id="riepilogo" data-bg="4">
@@ -3002,6 +3128,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
     <script>
       (function () {
         "use strict";
@@ -3024,6 +3151,21 @@
         const hasG = !!window.gsap,
           hasT = !!window.THREE;
         if (hasG && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+        // scroll inerziale (Lenis) agganciato al ticker GSAP: un solo rAF, niente scatti
+        if (window.Lenis && hasG && !reduce) {
+          const lenis = new Lenis({ duration: 1.25, easing: (x) => 1 - Math.pow(1 - x, 4) });
+          if (window.ScrollTrigger) lenis.on("scroll", ScrollTrigger.update);
+          gsap.ticker.add((s) => lenis.raf(s * 1000));
+          gsap.ticker.lagSmoothing(0);
+          document.querySelectorAll('a[href^="#"]').forEach((a) =>
+            a.addEventListener("click", (e) => {
+              const el = document.querySelector(a.getAttribute("href"));
+              if (!el) return;
+              e.preventDefault();
+              lenis.scrollTo(el, { offset: -84, duration: 1.6 });
+            }),
+          );
+        }
         const fine = matchMedia("(hover:hover) and (pointer:fine)").matches;
         const mouse = { nx: 0, ny: 0, sx: 0, sy: 0 };
         addEventListener(
@@ -4490,66 +4632,6 @@
           })();
 
         /* ================= ANELLI DI TESTO 3D ================= */
-        const rings = [...document.querySelectorAll(".ring3d")].map((el) => {
-          const cyl = document.createElement("div");
-          cyl.className = "cyl";
-          el.appendChild(cyl);
-          const cols = [
-            "--ink",
-            "--c2",
-            "--ink",
-            "--c1",
-            "--ink",
-            "--c3",
-            "--ink",
-            "--c4",
-          ];
-          let wi = 0;
-          const spans = [...el.dataset.text].map((ch) => {
-            const sp = document.createElement("span");
-            sp.textContent = ch;
-            if (ch === "·") wi++;
-            sp.style.color = `var(${ch === "·" ? "--dim" : cols[(wi * 2 + 1) % cols.length]})`;
-            cyl.appendChild(sp);
-            return sp;
-          });
-          const r = { el, cyl, spans, angles: [], vis: false };
-          function layout() {
-            const ws = spans.map((sp) => sp.offsetWidth || 20),
-              C = ws.reduce((a, b) => a + b, 0),
-              R = C / (2 * Math.PI);
-            let acc = 0;
-            r.angles = ws.map((w) => {
-              const a = ((acc + w / 2) / C) * 360;
-              acc += w;
-              return a;
-            });
-            spans.forEach(
-              (sp, i) =>
-                (sp.style.transform = `translate(-50%,-50%) rotateY(${r.angles[i]}deg) translateZ(${R}px)`),
-            );
-          }
-          layout();
-          addEventListener("resize", layout);
-          if (document.fonts) document.fonts.ready.then(layout);
-          new IntersectionObserver((es) =>
-            es.forEach((e) => (r.vis = e.isIntersecting)),
-          ).observe(el);
-          return r;
-        });
-        function ringFrame(now) {
-          rings.forEach((r, k) => {
-            if (!r.vis) return;
-            const rot =
-              -(scrollY * 0.14) - (reduce ? 0 : (now / 1000) * 7) + k * 40;
-            r.cyl.style.transform = `rotateX(-13deg) rotateY(${rot}deg)`;
-            r.spans.forEach((sp, i) => {
-              const c = Math.cos(((r.angles[i] + rot) * Math.PI) / 180);
-              sp.style.opacity = (0.12 + 0.88 * Math.max(0, c)).toFixed(2);
-            });
-          });
-        }
-
         /* ================= LETTERE ESTRUSE ================= */
         const x3ds = [...document.querySelectorAll(".x3d")].map((el) => {
           const st = document.createElement("div");
@@ -4608,14 +4690,14 @@
         /* ================= TILT, MAGNETI, TESSERE ================= */
         if (fine && !reduce) {
           document
-            .querySelectorAll(".card.lift:not(.st3d),.card.warn,.card.readout")
+            .querySelectorAll(".card.lift:not(.st3d),.card.warn,.card.readout,.card.sim")
             .forEach((c) => {
               c.classList.add("tilt");
               c.addEventListener("pointermove", (e) => {
                 const r = c.getBoundingClientRect(),
                   x = (e.clientX - r.left) / r.width,
                   y = (e.clientY - r.top) / r.height;
-                const k = c.classList.contains("readout") ? 0.35 : 1;
+                const k = c.classList.contains("readout") || c.classList.contains("sim") ? 0.3 : 1;
                 c.style.setProperty(
                   "--ry",
                   ((x - 0.5) * 10 * k).toFixed(2) + "deg",
@@ -4659,7 +4741,6 @@
           stages.forEach((s) => {
             if (s.visible) s.frame(now);
           });
-          ringFrame(now);
           x3dFrame();
           extrudeFrame();
           requestAnimationFrame(frame);
@@ -4716,10 +4797,10 @@
               ".hero3d h1 .ln > span",
               {
                 yPercent: 115,
-                rotateX: -60,
+                rotateX: -20,
                 transformPerspective: 800,
-                duration: 1.4,
-                stagger: 0.12,
+                duration: 1.7,
+                stagger: 0.1,
                 onComplete: () =>
                   document
                     .querySelectorAll(".hero3d h1 .ln")
@@ -4795,12 +4876,8 @@
           gsap.utils.toArray(".rv").forEach((el) => {
             if (below(el))
               gsap.set(el, {
-                rotateX: -28,
-                y: 80,
-                z: -140,
-                transformPerspective: 1000,
-                transformOrigin: "50% 0%",
-                opacity: 0.12,
+                y: 56,
+                opacity: 0,
               });
           });
           ScrollTrigger.batch(".rv", {
@@ -4808,12 +4885,10 @@
             once: true,
             onEnter: (b) =>
               gsap.to(b, {
-                rotateX: 0,
                 y: 0,
-                z: 0,
                 opacity: 1,
-                duration: 1.3,
-                stagger: 0.09,
+                duration: 1.5,
+                stagger: 0.08,
                 ease: "expo.out",
                 clearProps: "transform,opacity",
               }),
@@ -4822,18 +4897,16 @@
           document.querySelectorAll(".split").forEach((hd) => {
             const chars = splitChars(hd);
             if (below(hd))
-              gsap.set(chars, { rotateX: -100, y: 24, opacity: 0.06 });
+              gsap.set(chars, { yPercent: 115 });
             ScrollTrigger.create({
               trigger: hd,
               start: "top 88%",
               once: true,
               onEnter: () =>
                 gsap.to(chars, {
-                  rotateX: 0,
-                  y: 0,
-                  opacity: 1,
-                  duration: 1.3,
-                  stagger: 0.026,
+                  yPercent: 0,
+                  duration: 1.4,
+                  stagger: 0.018,
                   ease: "expo.out",
                 }),
             });
@@ -4849,12 +4922,12 @@
             gsap.fromTo(
               box.children,
               {
-                rotateY: -42,
-                rotateX: 24,
-                z: -320,
-                y: 140,
+                rotateY: -14,
+                rotateX: 8,
+                z: -90,
+                y: 90,
                 transformPerspective: 1100,
-                opacity: 0.15,
+                opacity: 0,
               },
               {
                 rotateY: 0,
@@ -4868,7 +4941,7 @@
                   trigger: box,
                   start: "top 98%",
                   end: "top 38%",
-                  scrub: 1,
+                  scrub: 0.8,
                 },
               },
             );
@@ -4879,7 +4952,7 @@
             .forEach((st) =>
               gsap.fromTo(
                 st,
-                { rotateX: 26, scale: 0.84, transformPerspective: 1400 },
+                { rotateX: 10, scale: 0.93, transformPerspective: 1400 },
                 {
                   rotateX: 0,
                   scale: 1,
@@ -4888,7 +4961,7 @@
                     trigger: st,
                     start: "top bottom",
                     end: "top 32%",
-                    scrub: 1,
+                    scrub: 0.8,
                   },
                 },
               ),
@@ -4898,10 +4971,8 @@
             const cells = tr.children;
             if (below(tr))
               gsap.set(cells, {
-                rotateX: -90,
-                transformPerspective: 700,
-                transformOrigin: "50% 0%",
-                opacity: 0.1,
+                y: 14,
+                opacity: 0,
               });
             ScrollTrigger.create({
               trigger: tr,
@@ -4909,9 +4980,9 @@
               once: true,
               onEnter: () =>
                 gsap.to(cells, {
-                  rotateX: 0,
+                  y: 0,
                   opacity: 1,
-                  duration: 0.9,
+                  duration: 1.1,
                   stagger: 0.03,
                   delay: (i % 6) * 0.05,
                   ease: "expo.out",
@@ -4920,9 +4991,10 @@
           });
           // tessere simboli: entrano girando
           gsap.from(".flip", {
-            rotateY: 180,
+            y: 36,
+            scale: 0.94,
             opacity: 0,
-            duration: 1.2,
+            duration: 1.3,
             stagger: 0.08,
             ease: "expo.out",
             scrollTrigger: { trigger: ".sym", start: "top 88%", once: true },
@@ -4931,8 +5003,8 @@
           gsap.fromTo(
             "footer .big",
             {
-              rotateX: 50,
-              y: 120,
+              rotateX: 18,
+              y: 70,
               transformPerspective: 900,
               transformOrigin: "50% 100%",
             },
@@ -4944,11 +5016,95 @@
                 trigger: "footer",
                 start: "top bottom",
                 end: "bottom bottom",
-                scrub: 1,
+                scrub: 0.8,
               },
             },
           );
         }
+      })();
+    </script>
+    <script>
+      /* simulatore: ricalcola tutto a ogni dato */
+      (function () {
+        const $ = (id) => document.getElementById(id);
+        const data = [];
+        const f = (v, d = 2) =>
+          (Math.round(v * 10 ** d) / 10 ** d).toLocaleString("it-IT", { maximumFractionDigits: d });
+        const el = (tag, txt, cls) => {
+          const n = document.createElement(tag);
+          if (txt != null) n.textContent = txt;
+          if (cls) n.className = cls;
+          return n;
+        };
+        function render() {
+          const chips = $("sim-chips"), stats = $("sim-stats"), bars = $("sim-bars"), tb = $("sim-tbody");
+          chips.replaceChildren(); stats.replaceChildren(); bars.replaceChildren(); tb.replaceChildren();
+          if (!data.length) {
+            chips.append(el("span", "Nessun dato: aggiungine uno o premi «Esempio».", "sim-empty"));
+            return;
+          }
+          data.forEach((v, i) => {
+            const b = el("button", f(v));
+            b.type = "button";
+            b.title = "Rimuovi";
+            b.onclick = () => { data.splice(i, 1); render(); };
+            chips.append(b);
+          });
+          const s = [...data].sort((a, b) => a - b), n = s.length;
+          const sum = s.reduce((a, b) => a + b, 0), mean = sum / n;
+          const median = n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2;
+          const freq = new Map();
+          s.forEach((v) => freq.set(v, (freq.get(v) || 0) + 1));
+          const max = Math.max(...freq.values());
+          const modes = max > 1 ? [...freq].filter(([, c]) => c === max).map(([v]) => v) : [];
+          const variance = s.reduce((a, v) => a + (v - mean) ** 2, 0) / n;
+          [
+            ["Dati (n)", n], ["Somma", f(sum)], ["Media", f(mean), 1], ["Mediana", f(median), 1],
+            ["Moda", modes.length ? modes.map((v) => f(v)).join(" · ") : "nessuna", 1],
+            ["Minimo", f(s[0])], ["Massimo", f(s[n - 1])], ["Campo di variaz.", f(s[n - 1] - s[0])],
+            ["Dev. standard", f(Math.sqrt(variance))],
+          ].forEach(([k, v, hl]) => {
+            const d = el("div", null, "sim-stat" + (hl ? " hl" : ""));
+            d.append(el("span", k), el("b", String(v)));
+            stats.append(d);
+          });
+          let cum = 0;
+          freq.forEach((c, v) => {
+            cum += c;
+            const bar = el("div", null, "sim-bar" + (modes.includes(v) ? " mode" : ""));
+            const i = el("i"); i.style.setProperty("--h", (c / max) * 100 + "%");
+            bar.append(i, el("em", c), el("span", f(v)));
+            bars.append(bar);
+            const tr = el("tr");
+            [f(v), c, f(c / n, 3), f((c / n) * 100, 1), cum].forEach((x) => tr.append(el("td", x)));
+            tb.append(tr);
+          });
+        }
+        function add(txt) {
+          const msg = $("sim-msg");
+          const parts = txt.split(/[\s;]+/).filter(Boolean);
+          const nums = parts.map((x) => Number(x.replace(",", ".")));
+          if (!parts.length) return;
+          if (nums.some((x) => !Number.isFinite(x))) {
+            msg.textContent = "Inserisci solo numeri (decimali con la virgola).";
+            msg.classList.add("err");
+            return;
+          }
+          msg.textContent = "Clicca un dato per rimuoverlo. Decimali con la virgola.";
+          msg.classList.remove("err");
+          data.push(...nums);
+          render();
+        }
+        $("sim-form").onsubmit = (e) => {
+          e.preventDefault();
+          const inp = $("sim-in");
+          add(inp.value);
+          inp.value = "";
+          inp.focus();
+        };
+        $("sim-clear").onclick = () => { data.length = 0; render(); $("sim-in").focus(); };
+        $("sim-ex").onclick = () => { data.length = 0; add("10 10 11 12 12 12 13 15 18 50"); };
+        render();
       })();
     </script>
   </body>
