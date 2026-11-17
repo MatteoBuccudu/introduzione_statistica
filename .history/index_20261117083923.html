@@ -1,0 +1,1187 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Statistica Descrittiva 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sala buia con luce di proiettore — gradiente fisso che cambia tinta per sezione, contenuto su lastre di vetro */
+:root{
+  --bg:#070A12; --glass:rgba(17,23,40,.72); --line:rgba(160,180,235,.2);
+  --ink:#F1F3FA; --muted:#B3BCD4; --dim:#7D88A6;
+  --c1:#6B98FF; --c2:#FFAE5E; --c3:#46DBAD; --c4:#C29BFF; --warn:#FF7B6E;
+  --f-display:"Bebas Neue","Oswald","Arial Narrow",Impact,sans-serif;
+  --f-serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --f-body:"Onest",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:84px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17.5px;line-height:1.7;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+::selection{background:var(--c2);color:var(--bg)}
+.skip{position:absolute;left:16px;top:-60px;z-index:100;background:var(--c2);color:var(--bg);padding:8px 14px;border-radius:8px;font-weight:600}
+.skip:focus{top:calc(10px + env(safe-area-inset-top,0px))}
+
+/* sfondo: gradienti che sfumano tra le sezioni */
+.bgw{position:fixed;inset:0;z-index:0;pointer-events:none;background:var(--bg)}
+.bgl{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease}
+.bgl.on{opacity:1}
+.l0{background:radial-gradient(70% 60% at 78% 30%,rgba(255,174,94,.30),transparent 70%),radial-gradient(60% 60% at 15% 85%,rgba(107,152,255,.32),transparent 70%),linear-gradient(160deg,#0B1022,#070A12 60%)}
+.l1{background:radial-gradient(65% 55% at 85% 20%,rgba(107,152,255,.34),transparent 70%),radial-gradient(55% 50% at 10% 70%,rgba(70,219,173,.18),transparent 70%),linear-gradient(170deg,#0A1226,#070A12 65%)}
+.l2{background:radial-gradient(60% 55% at 20% 25%,rgba(255,174,94,.26),transparent 70%),radial-gradient(60% 60% at 85% 80%,rgba(70,219,173,.24),transparent 70%),linear-gradient(190deg,#0C1320,#070A12 65%)}
+.l3{background:radial-gradient(65% 60% at 80% 30%,rgba(194,155,255,.30),transparent 70%),radial-gradient(55% 55% at 12% 80%,rgba(255,123,110,.18),transparent 70%),linear-gradient(170deg,#100D24,#070A12 65%)}
+.l4{background:radial-gradient(70% 60% at 50% 15%,rgba(107,152,255,.28),transparent 70%),radial-gradient(60% 50% at 50% 100%,rgba(255,174,94,.24),transparent 70%),linear-gradient(180deg,#0B1022,#070A12 70%)}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.06;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.page{position:relative;z-index:3}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:400;line-height:.95;text-wrap:balance;margin:0;letter-spacing:.01em}
+h2{font-size:clamp(3rem,7vw,5.6rem)}
+h3{font-size:clamp(1.7rem,2.6vw,2.1rem);letter-spacing:.02em;line-height:1}
+h4{font-size:1.55rem;letter-spacing:.03em}
+em.s{font-family:var(--f-serif);font-style:italic;font-weight:400;letter-spacing:0;text-transform:none}
+p{margin:0;max-width:66ch}
+strong{font-weight:600;color:#fff}
+.eyebrow{font-family:var(--f-mono);font-size:.76rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--f-mono);font-size:.9em}
+.lead{font-size:1.12rem;color:var(--muted)}
+
+/* nav */
+.progress{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);height:3px;z-index:70;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--c1),var(--c4),var(--c2))}
+nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(7,10,18,.7);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;gap:6px;align-items:center;padding-block:12px;overflow-x:auto;scrollbar-width:none}
+nav.top .brand{font-family:var(--f-display);font-size:1.5rem;letter-spacing:.04em;white-space:nowrap;margin-right:auto;line-height:1}
+nav.top a{font-family:var(--f-mono);font-size:.8rem;text-decoration:none;color:var(--muted);padding:7px 13px;border-radius:999px;white-space:nowrap;border:1px solid transparent;transition:color .3s,border-color .3s,background .3s}
+nav.top a:hover{color:var(--ink);border-color:var(--line)}
+nav.top a.on{color:var(--ink);border-color:var(--c2);background:rgba(255,174,94,.1)}
+
+/* hero */
+.hero{display:grid;gap:26px;padding-block:72px 56px;min-height:78vh;align-content:center}
+.hero h1{font-size:clamp(4.4rem,14vw,11.5rem);line-height:.84;letter-spacing:.005em}
+.hero h1 .ln{display:block;overflow:hidden;padding-top:.04em}
+.hero h1 .ln > span{display:inline-block}
+.hero h1 em.s{color:var(--c2);font-size:.9em}
+.hero .lede{font-size:clamp(1.08rem,1.7vw,1.28rem);color:var(--muted);max-width:56ch}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--f-mono);font-size:.76rem;border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:6px 13px;color:var(--muted)}
+.howto{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:900px}
+.howto div{border-top:1px solid var(--line);padding-top:12px;display:grid;gap:4px}
+.howto b{font-family:var(--f-display);font-size:1.4rem;letter-spacing:.04em;font-weight:400}
+.howto span{color:var(--muted);font-size:.95rem;line-height:1.5}
+
+/* sections */
+section.part{padding-block:100px 30px;position:relative}
+.part-head{position:relative;display:grid;gap:14px;margin-bottom:40px;padding-top:24px}
+.part-head .ghost{position:absolute;right:0;top:-.1em;font-family:var(--f-display);font-size:clamp(10rem,30vw,26rem);line-height:.75;color:transparent;-webkit-text-stroke:1.5px rgba(160,180,235,.2);pointer-events:none;user-select:none;z-index:-1}
+.part-head .eyebrow b{color:var(--c2);font-weight:500}
+.block{display:grid;gap:18px;margin-block:44px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.four{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.two > *,.three > *,.four > *{min-width:0}
+
+.card{position:relative;background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:22px 24px;display:grid;gap:12px;align-content:start;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:transform .5s var(--ease),border-color .4s,box-shadow .5s var(--ease)}
+.card.lift:not(.tilt):not(.st3d):hover{transform:translateY(-4px)}
+.card.lift:hover{border-color:rgba(160,180,235,.42);box-shadow:0 26px 70px -30px rgba(107,152,255,.45)}
+.card h3 small{font-family:var(--f-mono);font-size:.74rem;color:var(--muted);margin-left:8px;letter-spacing:0}
+ul,ol{margin:0;padding-left:1.2em;display:grid;gap:6px}
+li::marker{color:var(--c2)}
+.tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.tag::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--tc)}
+.t1{--tc:var(--c1)}.t2{--tc:var(--c2)}.t3{--tc:var(--c3)}.t4{--tc:var(--c4)}
+.def{display:grid;gap:3px;padding:12px 0;border-top:1px solid var(--line)}
+.def:first-of-type{border-top:none;padding-top:0}
+.def .mono{color:var(--muted)}
+
+/* "In parole semplici" */
+.simple{display:grid;gap:4px;border-radius:14px;padding:14px 18px;background:linear-gradient(120deg,rgba(255,174,94,.16),rgba(255,174,94,.04));border:1px solid rgba(255,174,94,.35)}
+.simple > b{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c2);font-weight:500}
+.simple p{font-size:1.04rem}
+.ex{border-left:3px solid var(--c1);background:linear-gradient(90deg,rgba(107,152,255,.14),transparent 85%);border-radius:0 14px 14px 0;padding:14px 18px}
+.ex > b{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c1);display:block;margin-bottom:4px;font-weight:500}
+.steps{counter-reset:s;list-style:none;padding:0;display:grid;gap:8px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:baseline}
+.steps li::before{content:counter(s);font-family:var(--f-display);font-size:1.3rem;color:var(--bg);background:var(--c3);border-radius:50%;width:26px;height:26px;display:grid;place-items:center;line-height:1;padding-top:2px}
+
+/* formula */
+.formula{font-family:var(--f-mono);font-size:1.12rem;background:rgba(7,10,18,.55);border:1px solid var(--line);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;overflow-x:auto}
+.formula .note{font-family:var(--f-body);font-size:.88rem;color:var(--muted);flex-basis:100%}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.25}
+.frac > span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px 2px}
+.frac > span:last-child{padding:2px 4px 0}
+
+/* warnings */
+.warn{border-color:rgba(255,123,110,.5);background:linear-gradient(135deg,rgba(255,123,110,.15),rgba(17,23,40,.72) 60%);padding-left:66px}
+.warn::before{content:"!";position:absolute;left:20px;top:22px;width:30px;height:30px;border-radius:50%;background:var(--warn);color:var(--bg);font-family:var(--f-display);font-size:1.3rem;display:grid;place-items:center;padding-top:2px}
+.warn h4{color:var(--warn)}
+.warn .lbl-w{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--warn)}
+
+/* tabelle */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:18px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+table{border-collapse:collapse;width:100%;font-size:1rem;font-variant-numeric:tabular-nums}
+caption{text-align:left;padding:14px 18px 0;color:var(--muted);font-size:.9rem}
+th,td{padding:12px 18px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;transition:background .3s}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:var(--f-mono);font-size:.78rem;font-weight:500;color:var(--muted)}
+thead th small{display:block;font-family:var(--f-body);font-size:.72rem;color:var(--dim);font-weight:400}
+tbody tr:hover td,tbody tr.on td{background:rgba(107,152,255,.16)}
+tbody tr.on td:first-child{box-shadow:inset 3px 0 0 var(--c2)}
+tfoot td{font-weight:600;border-bottom:none;color:var(--muted)}
+td .sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:10px}
+table.cmp td,table.cmp th{white-space:normal;text-align:left;vertical-align:top}
+.yes{color:var(--c3);font-weight:600}.no{color:var(--warn);font-weight:600}.mid{color:var(--c2);font-weight:600}
+
+/* simboli */
+.sym{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.path{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.path .card{gap:6px}
+.path .n{font-family:var(--f-display);font-size:3rem;line-height:.9;color:var(--tc)}
+
+/* quiz e strumenti */
+.quiz{display:grid;gap:10px}
+.qi{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.qi:first-child{border-top:none}
+.qi .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qi .fb{grid-column:1/-1;font-size:.92rem;color:var(--muted)}
+.qi .fb:empty{display:none}
+.qi .fb.ok{color:var(--c3)}.qi .fb.ko{color:var(--warn)}
+.btn{font-family:var(--f-mono);font-size:.82rem;padding:9px 15px;border-radius:999px;border:1px solid var(--line);background:rgba(7,10,18,.55);color:var(--ink);cursor:pointer;
+  position:relative;overflow:hidden;isolation:isolate;transition:border-color .3s,color .3s,transform .3s var(--ease)}
+.btn::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--ink);transform:translateY(101%);transition:transform .45s var(--ease)}
+.btn:hover{border-color:rgba(241,243,250,.6);transform:translateY(-1px)}
+.btn[aria-pressed="true"]{color:var(--bg);border-color:var(--ink)}
+.btn[aria-pressed="true"]::before{transform:translateY(0)}
+.btn.bad::before{background:var(--warn)}
+.btn.ok{border-color:var(--c3);color:var(--c3)}
+.btn.ko{border-color:var(--warn);color:var(--warn)}
+.btn:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--c2);outline-offset:3px}
+.finder{display:grid;gap:14px}
+.finder .q{display:grid;gap:8px}
+.finder .q > span{font-weight:600}
+.result{border-radius:14px;padding:16px 18px;background:linear-gradient(120deg,rgba(70,219,173,.18),rgba(70,219,173,.04));border:1px solid rgba(70,219,173,.45);display:grid;gap:4px}
+.result b{font-family:var(--f-display);font-size:1.9rem;font-weight:400;letter-spacing:.03em;line-height:1}
+
+/* 3D */
+.lab{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:stretch}
+.lab > *{min-width:0}
+.stage{position:relative;border:1px solid var(--line);border-radius:22px;overflow:hidden;height:clamp(380px,50vw,540px);
+  background:radial-gradient(90% 70% at 50% 35%,#17213C 0%,#0A0F1C 72%);box-shadow:0 40px 110px -45px rgba(107,152,255,.45)}
+.stage canvas{display:block;width:100%;height:100%;touch-action:pan-y;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.stage .hint{position:absolute;left:16px;bottom:14px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);pointer-events:none}
+.stage .corner{position:absolute;right:16px;top:14px;font-family:var(--f-mono);font-size:.72rem;color:var(--dim);pointer-events:none}
+.stage .lbl{position:absolute;left:0;top:0;pointer-events:none;font-family:var(--f-mono);font-size:.78rem;font-weight:500;white-space:nowrap;background:rgba(7,10,18,.8);border:1px solid var(--line);border-radius:7px;padding:2px 8px;color:var(--ink);transition:border-color .3s,background .3s}
+.stage .lbl.on{border-color:var(--c2);background:rgba(255,174,94,.22)}
+.stage .lbl.tick{border:none;background:transparent;color:var(--dim);font-size:.72rem}
+.tip{position:absolute;left:0;top:0;pointer-events:none;z-index:4;min-width:160px;max-width:250px;padding:10px 12px;border-radius:12px;background:rgba(10,14,26,.92);border:1px solid rgba(160,180,235,.35);font-size:.86rem;line-height:1.45;opacity:0;transform:translate(16px,16px);transition:opacity .2s}
+.tip.show{opacity:1}
+.tip b{display:block;font-family:var(--f-display);font-size:1.25rem;font-weight:400;letter-spacing:.03em;margin-bottom:2px}
+.tip span{font-family:var(--f-mono);font-size:.76rem;color:var(--muted)}
+.readout{display:grid;gap:12px;align-content:start}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.stat{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:8px;gap:10px}
+.stat span{color:var(--muted);font-size:.92rem}
+.stat output{font-family:var(--f-display);font-size:2rem;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:.02em}
+input[type=range]{width:100%;accent-color:var(--warn);height:30px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.88rem;color:var(--muted)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+
+.cheat .card{min-height:220px;align-content:space-between}
+.cheat .num{font-family:var(--f-serif);font-style:italic;font-size:3.2rem;line-height:.8;color:var(--tc)}
+.cheat .q{font-family:var(--f-mono);font-size:.76rem;color:var(--muted)}
+dl.gloss{display:grid;grid-template-columns:repeat(2,1fr);gap:0 28px;margin:0}
+dl.gloss div{padding:14px 0;border-top:1px solid var(--line);display:grid;gap:2px}
+dl.gloss dt{font-family:var(--f-display);font-size:1.45rem;letter-spacing:.03em;line-height:1}
+dl.gloss dd{margin:0;color:var(--muted);font-size:.97rem}
+
+footer{padding-block:80px 70px;color:var(--muted);font-size:.88rem;display:grid;gap:22px}
+footer .big{font-family:var(--f-display);font-size:clamp(3.4rem,11vw,9rem);line-height:.85;color:var(--ink)}
+footer .big em.s{color:var(--c3);font-size:.85em}
+
+@media (max-width:900px){
+  .two,.lab,.three{grid-template-columns:1fr}
+  .four,.path{grid-template-columns:1fr 1fr}
+  .howto{grid-template-columns:1fr}
+  dl.gloss{grid-template-columns:1fr}
+  section.part{padding-block:72px 24px}
+}
+@media (max-width:540px){.four,.path{grid-template-columns:1fr}.warn{padding-left:60px}.hero{min-height:auto;padding-top:52px}.qi{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.bgl{transition:none}.card,.btn{transition:none}}
+
+/* ===== HERO 3D (scrollytelling) ===== */
+.hero3d{position:relative;height:330vh}
+.hero3d .pin{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.hero3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero3d .shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(7,10,18,.8) 0%,rgba(7,10,18,.35) 42%,transparent 68%),linear-gradient(0deg,rgba(7,10,18,.75),transparent 42%)}
+.hero3d .ovw{position:relative;height:100%;pointer-events:none;max-width:1160px;margin:0 auto}
+.hero3d .ov{position:absolute;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:max(8vh,44px);display:grid;gap:18px;max-width:760px;will-change:transform,opacity;transform-origin:0 100%}
+.hero3d .ov:not(.ov0){opacity:0}
+.hero3d h1{font-size:clamp(4rem,12vw,10.5rem);line-height:.84;letter-spacing:.005em}
+.hero3d h1 .ln{display:block;overflow:hidden;padding-top:.05em}
+.hero3d h1 .ln.open{overflow:visible}
+.hero3d h1 .ln > span{display:inline-block}
+.hero3d h1 em.s{color:var(--c2);font-size:.9em}
+.hero3d .lede{font-size:clamp(1.05rem,1.6vw,1.22rem);color:var(--muted);max-width:54ch}
+.ov .k{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--c2)}
+.ovh{font-size:clamp(3.2rem,8vw,6.6rem)}
+.ovh em.s{color:var(--c3)}
+.ov p{color:var(--muted);font-size:1.12rem;max-width:50ch}
+.scroll-cue{display:flex;align-items:center;gap:12px;font-family:var(--f-mono);font-size:.74rem;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.scroll-cue i{width:1px;height:46px;background:linear-gradient(var(--c2),transparent);position:relative;overflow:hidden}
+.scroll-cue i::after{content:"";position:absolute;left:0;top:-30%;width:1px;height:30%;background:#fff;animation:drip 1.8s var(--ease) infinite}
+@keyframes drip{to{top:110%}}
+.dots{position:absolute;right:max(20px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);list-style:none;margin:0;padding:0;display:grid;gap:16px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);pointer-events:none}
+.dots li{display:flex;align-items:center;gap:12px;justify-content:flex-end;transition:color .4s}
+.dots li::after{content:"";width:8px;height:8px;border-radius:5px;border:1px solid currentColor;transition:all .5s var(--ease)}
+.dots li.on{color:var(--ink)}
+.dots li.on::after{background:var(--c2);border-color:var(--c2);box-shadow:0 0 14px var(--c2);width:26px}
+
+/* ===== anelli di testo 3D ===== */
+.ring3d{height:clamp(220px,32vw,380px);perspective:1000px;display:grid;place-items:center;overflow:hidden;position:relative;z-index:2}
+.ring3d .cyl{position:relative;width:0;height:0;transform-style:preserve-3d}
+.ring3d .cyl span{position:absolute;left:0;top:0;font-family:var(--f-display);font-size:clamp(3rem,7.5vw,6.4rem);line-height:1;white-space:pre}
+
+/* ===== lettere estruse ===== */
+.x3d{position:absolute;right:0;top:-.08em;font-family:var(--f-display);font-size:clamp(8rem,24vw,21rem);line-height:.8;perspective:900px;pointer-events:none;user-select:none;z-index:-1;opacity:.9}
+.x3d .stack{display:grid;transform-style:preserve-3d;will-change:transform}
+.x3d .stack span{grid-area:1/1}
+.x3d .stack .front{background:linear-gradient(160deg,var(--c2),var(--c4) 55%,var(--c1));-webkit-background-clip:text;background-clip:text;color:transparent}
+@media (min-width:901px){.part-head{padding-right:28%}}
+@media (max-width:900px){.x3d{opacity:.28}}
+
+/* ===== titoli che si ribaltano ===== */
+.split{perspective:900px}
+.split .w{display:inline-block;white-space:nowrap}
+.split .ch{display:inline-block;transform-origin:50% 100%;backface-visibility:hidden}
+
+/* ===== card in prospettiva ===== */
+.card.tilt{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px));transition:transform .7s var(--ease),border-color .4s,box-shadow .5s var(--ease)}
+.card.tilt:hover{--ty:-6px;transition:transform .18s linear,border-color .4s,box-shadow .5s var(--ease)}
+.card.tilt::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(380px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.12),transparent 45%)}
+.card.tilt:hover::after{opacity:1}
+
+/* ===== tessere che girano ===== */
+.flip{perspective:900px;height:156px;border-radius:16px;cursor:pointer}
+.flip .in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .9s var(--ease)}
+.flip:hover .in,.flip:focus-visible .in,.flip.on .in{transform:rotateY(180deg)}
+.flip:focus-visible{outline:3px solid var(--c2);outline-offset:3px}
+.flip .f,.flip .b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;border:1px solid var(--line);display:grid;place-items:center;align-content:center;gap:6px;text-align:center;padding:14px}
+.flip .f{background:var(--glass);backdrop-filter:blur(12px)}
+.flip .f b{font-family:var(--f-mono);font-size:2.6rem;font-weight:500;color:var(--c2);line-height:1}
+.flip .f small{font-family:var(--f-mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.flip .b{transform:rotateY(180deg);background:linear-gradient(135deg,rgba(255,174,94,.26),rgba(17,23,40,.95) 70%);font-size:.98rem;line-height:1.45}
+.flip .b b{font-family:var(--f-mono);color:var(--c2);font-size:1.2rem}
+
+.stage.s3d{transform-origin:50% 100%}
+@media (max-width:700px){.dots{display:none}.hero3d .shade{background:linear-gradient(0deg,rgba(7,10,18,.92) 15%,rgba(7,10,18,.3) 65%)}.hero3d{height:300vh}}
+@media (prefers-reduced-motion: reduce){.scroll-cue i::after{animation:none}.flip .in,.card.tilt{transition:none}}
+@media print{
+  :root{--bg:#fff;--glass:#fff;--line:#c9cfdd;--ink:#11141c;--muted:#3b4255;--dim:#5a6175;--c1:#2950b8;--c2:#a85a10;--c3:#0f7a5a;--c4:#6a3fb5;--warn:#b3261e;color-scheme:light}
+  body{background:#fff;color:#11141c;font-size:11.5pt;line-height:1.5}
+  strong{color:#11141c}
+  .bgw,.grain,.progress,nav.top,.skip,.hero3d,.stage,.lab .readout,.lab,.x3d,.ghost,.scroll-cue,.quiz,.finder,#c-gal,.controls,.howto{display:none!important}
+  section.part{padding-block:14pt 0}
+  .part-head{margin-bottom:10pt}
+  h2{font-size:26pt}h3{font-size:15pt}
+  .card,.tbl{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;background:#fff;break-inside:avoid}
+  .block{margin-block:14pt}
+  .three,.four,.path{grid-template-columns:1fr 1fr}
+  .rv,.split,.split *{opacity:1!important;transform:none!important}
+  th,td{padding:6pt 8pt}
+}
+</style>
+
+<a class="skip" href="#inizio">Salta al contenuto</a>
+<div class="bgw" aria-hidden="true"><div class="bgl l0 on"></div><div class="bgl l1"></div><div class="bgl l2"></div><div class="bgl l3"></div><div class="bgl l4"></div></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"></div>
+
+<div class="page">
+<nav class="top" aria-label="Sezioni"><div class="wrap">
+  <span class="brand">Statistica descrittiva</span>
+  <a href="#inizio" data-sec="inizio">Prima di iniziare</a><a href="#sez-a" data-sec="sez-a">A · Frequenze</a><a href="#sez-b" data-sec="sez-b">B · Media, mediana, moda</a><a href="#sez-c" data-sec="sez-c">C · Grafici</a><a href="#riepilogo" data-sec="riepilogo">Riepilogo</a>
+</div></nav>
+
+<section class="hero3d" id="top" data-bg="0" aria-label="Introduzione">
+ <div class="pin">
+  <canvas id="cv-hero" aria-hidden="true"></canvas>
+  <div class="shade" aria-hidden="true"></div>
+  <div class="tip" id="hero-tip"></div>
+  <div class="ovw">
+   <div class="ov ov0">
+    <div class="eyebrow">Corso IFTS · Modulo di Statistica · A.F. 2026/27</div>
+    <h1 class="extrude" aria-label="La statistica, spiegata semplice"><span class="ln"><span>La statistica,</span></span><span class="ln"><span>spiegata</span></span><span class="ln"><span><em class="s">semplice.</em></span></span></h1>
+    <p class="lede">Una guida per chi parte da zero: cosa significano i numeri di un report, come si calcolano e quale grafico usare. Solo esempi piccoli e concreti.</p>
+    <div class="chips"><span class="chip">Lavoro a coppie</span><span class="chip">Montagner · Buccudu</span><span class="chip">Manuale di riferimento rapido</span></div>
+    <div class="scroll-cue"><i></i>Scorri: 40 cubi ti raccontano la guida</div>
+   </div>
+   <div class="ov ov1"><span class="k">01 · Contare</span><h2 class="ovh">40 clienti, <em class="s">40 cubi</em></h2><p>Ogni cubo è un cliente che ha dato un giudizio. Raggruppati per risposta formano quattro torri: l'altezza di ogni torre è la <strong>frequenza</strong>. 4 Scarso, 10 Sufficiente, 18 Buono, 8 Ottimo.</p></div>
+   <div class="ov ov2"><span class="k">02 · Mettere in fila</span><h2 class="ovh">Quello <em class="s">in mezzo</em></h2><p>Mettiamo i 40 giudizi in fila dal peggiore al migliore. I due cubi al centro, il 20° e il 21°, sono entrambi «Buono»: quella è la <strong>mediana</strong>.</p></div>
+   <div class="ov ov3"><span class="k">03 · Disegnare</span><h2 class="ovh">Le stesse quote, <em class="s">in cerchio</em></h2><p>Gli stessi 40 cubi diventano una torta: 10% · 25% · 45% · 20%. Scegliere il grafico giusto è l'ultimo passo.</p></div>
+  </div>
+  <ol class="dots" aria-hidden="true"><li class="on">Inizio</li><li>Contare</li><li>In fila</li><li>Disegnare</li></ol>
+ </div>
+</section>
+<div class="ring3d" aria-hidden="true" data-text="MEDIA · MEDIANA · MODA · FREQUENZE · GRAFICI · "></div>
+
+<main class="wrap">
+
+<!-- ================= PRIMA DI INIZIARE ================= -->
+<section class="part" id="inizio" data-bg="0">
+  <div class="part-head">
+    <div class="eyebrow rv">Capitolo zero</div>
+    <h2 class="split">Prima di <em class="s">iniziare</em></h2>
+  </div>
+  <div class="howto rv" style="margin-bottom:28px">
+    <div><b>Leggi</b><span>Ogni concetto parte da un riquadro arancione «In parole semplici».</span></div>
+    <div><b>Guarda</b><span>Un micro-esempio con i passaggi numerati, uno per uno.</span></div>
+    <div><b>Prova</b><span>Nei laboratori 3D trascina, passa sopra con il mouse e premi i pulsanti.</span></div>
+  </div>
+  <div class="two">
+    <div class="simple rv"><b>In parole semplici</b>
+      <p>Hai una pila di dati, per esempio il giudizio di 40 clienti sull'assistenza. Leggerli uno per uno non ti dice niente. La <strong>statistica descrittiva</strong> li <strong>conta</strong>, li <strong>riassume</strong> in pochi numeri e li <strong>disegna</strong>, così capisci in un colpo d'occhio cosa raccontano.</p></div>
+    <div class="card rv"><p>Descrive i dati che <strong>hai già raccolto</strong>. Non fa previsioni e non dice “perché” succede qualcosa: fotografa la situazione. È il primo passo di qualsiasi report.</p></div>
+  </div>
+
+  <div class="block">
+    <h3 class="rv">Il percorso in 4 passi</h3>
+    <div class="path">
+      <div class="card lift st3d t1"><span class="n">1</span><h4>Che dato ho?</h4><p>Parole o numeri? Lo capisci nella sezione A.</p></div>
+      <div class="card lift st3d t2"><span class="n">2</span><h4>Conto</h4><p>Quante volte compare ogni valore: le frequenze, sezione A.</p></div>
+      <div class="card lift st3d t3"><span class="n">3</span><h4>Riassumo</h4><p>Un numero che rappresenta tutti: media, mediana o moda, sezione B.</p></div>
+      <div class="card lift st3d t4"><span class="n">4</span><h4>Disegno</h4><p>Il grafico giusto per quel tipo di dato, sezione C.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3 class="rv">Come leggere i simboli</h3>
+    <p class="rv">Le formule sembrano difficili solo per i simboli. Passa sopra (o tocca) ogni tessera per girarla e leggere la traduzione.</p>
+    <div class="sym rv">
+      <div class="flip" tabindex="0" role="button" aria-label="n: quanti dati hai in totale. 40 clienti → n = 40"><div class="in"><div class="f"><b>n</b><small>gira</small></div><div class="b"><span><b>n</b><br>quanti dati hai in totale. 40 clienti → n = 40</span></div></div></div>
+      <div class="flip" tabindex="0" role="button" aria-label="i: “quale riga”: la 1ª modalità, la 2ª, la 3ª…"><div class="in"><div class="f"><b>i</b><small>gira</small></div><div class="b"><span><b>i</b><br>“quale riga”: la 1ª modalità, la 2ª, la 3ª…</span></div></div></div>
+      <div class="flip" tabindex="0" role="button" aria-label="nᵢ: quante volte compare la modalità della riga i"><div class="in"><div class="f"><b>nᵢ</b><small>gira</small></div><div class="b"><span><b>nᵢ</b><br>quante volte compare la modalità della riga i</span></div></div></div>
+      <div class="flip" tabindex="0" role="button" aria-label="xᵢ: il singolo valore misurato (un pezzo, un tempo)"><div class="in"><div class="f"><b>xᵢ</b><small>gira</small></div><div class="b"><span><b>xᵢ</b><br>il singolo valore misurato (un pezzo, un tempo)</span></div></div></div>
+      <div class="flip" tabindex="0" role="button" aria-label="Σ: “sigma”: vuol dire somma tutto"><div class="in"><div class="f"><b>Σ</b><small>gira</small></div><div class="b"><span><b>Σ</b><br>“sigma”: vuol dire somma tutto</span></div></div></div>
+      <div class="flip" tabindex="0" role="button" aria-label="x̄: “x segnato”: è la media"><div class="in"><div class="f"><b>x̄</b><small>gira</small></div><div class="b"><span><b>x̄</b><br>“x segnato”: è la media</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SEZIONE A ================= -->
+<section class="part" id="sez-a" data-bg="1">
+  <div class="part-head">
+    <span class="x3d" aria-hidden="true" data-l="A"></span>
+    <div class="eyebrow rv">Sezione <b>A</b> · 1 di 3</div>
+    <h2 class="split">Rilevazione e <em class="s">frequenze</em></h2>
+    <p class="lead rv">Prima di fare qualunque conto bisogna capire che tipo di dato hai in mano: è il tipo a decidere quali conti hanno senso.</p>
+  </div>
+
+  <div class="block">
+    <h3 class="rv">Variabile e modalità</h3>
+    <div class="simple rv"><b>In parole semplici</b><p>Pensa a un modulo da compilare. Ogni <strong>domanda</strong> è una <strong>variabile</strong> (o carattere): “Che colore vuoi?”, “Quanti anni hai?”. Ogni <strong>risposta possibile</strong> è una <strong>modalità</strong>: “rosso”, “blu”, “34”.</p></div>
+    <p class="rv">Le variabili sono di due famiglie: quelle che si rispondono <strong>a parole</strong> (qualitative) e quelle che si rispondono <strong>con un numero misurato o contato</strong> (quantitative). Ognuna ha due sottotipi.</p>
+    <div class="two">
+      <div class="card lift rv"><h3>Qualitative <small>a parole</small></h3>
+        <div class="def"><span class="tag t1">Nominali</span><span>Etichette senza un ordine: nessuna viene “prima” di un'altra.</span><span class="mono">reparto: Montaggio, Verniciatura, Magazzino</span></div>
+        <div class="def"><span class="tag t2">Ordinali</span><span>Etichette che si possono mettere in fila, ma senza sapere “di quanto” una supera l'altra.</span><span class="mono">giudizio: Scarso → Sufficiente → Buono → Ottimo</span></div>
+      </div>
+      <div class="card lift rv"><h3>Quantitative <small>con numeri</small></h3>
+        <div class="def"><span class="tag t3">Discrete</span><span>Si <strong>contano</strong>: numeri interi, salti netti (non esistono 2,5 difetti).</span><span class="mono">n° difetti per lotto: 0, 1, 2, 3…</span></div>
+        <div class="def"><span class="tag t4">Continue</span><span>Si <strong>misurano</strong>: tra due valori ce ne sono infiniti altri.</span><span class="mono">diametro 10,02 mm · tempo 3,7 giorni</span></div>
+      </div>
+    </div>
+    <div class="ex rv"><b>Trucco veloce</b>Chiediti: «ha senso fare la differenza tra due valori?» Se sì, è quantitativa. Se no: «posso metterli in fila?» Se sì è ordinale, altrimenti nominale. Attenzione ai codici: un CAP o un codice reparto “12” sembrano numeri ma restano nominali.</div>
+  </div>
+
+  <div class="block">
+    <div class="card rv">
+      <div class="eyebrow">Mettiti alla prova</div>
+      <h3>Che tipo di variabile è?</h3>
+      <div class="quiz" id="quiz"></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3 class="rv">Le frequenze: contare con ordine</h3>
+    <div class="simple rv"><b>In parole semplici</b><p><strong>Assoluta</strong>: quante volte. <strong>Relativa / percentuale</strong>: che fetta del totale. <strong>Cumulata</strong>: quanti “fino a qui”, sommando le righe precedenti.</p></div>
+    <div class="three">
+      <div class="card lift rv"><span class="tag t1">Assoluta nᵢ</span>
+        <p>Il semplice conteggio di quante volte compare una modalità.</p>
+        <div class="formula">n₁ + n₂ + … = n<span class="note">sommate danno il totale</span></div></div>
+      <div class="card lift rv"><span class="tag t2">Relativa fᵢ e percentuale pᵢ%</span>
+        <p>La quota sul totale. Serve a confrontare gruppi di grandezza diversa.</p>
+        <div class="formula">fᵢ = <span class="frac"><span>nᵢ</span><span>n</span></span><span>pᵢ% = fᵢ × 100</span><span class="note">sommate danno 1, cioè il 100%</span></div></div>
+      <div class="card lift rv"><span class="tag t3">Cumulata Nᵢ e Fᵢ</span>
+        <p>Somma le frequenze dalla prima riga fino a quella. Risponde a <strong>«quanti al massimo…?»</strong>.</p>
+        <div class="formula">Nᵢ = n₁ + … + nᵢ<span>Fᵢ = <span class="frac"><span>Nᵢ</span><span>n</span></span></span><span class="note">l'ultima vale sempre n (o 1)</span></div></div>
+    </div>
+    <div class="card rv" style="border-color:rgba(70,219,173,.4)"><p><strong>La cumulata ha senso solo se le modalità hanno un ordine</strong>: sì per ordinali e quantitative, no per le nominali. Serve per frasi come «l'80% dei clienti ha dato al massimo Buono» o «il 55% degli ordini arriva entro 4 giorni».</p></div>
+  </div>
+
+  <div class="block">
+    <h3 class="rv">La tabella di frequenza</h3>
+    <p class="rv">Esempio: 40 clienti danno un giudizio sull'assistenza post-vendita. Passa il mouse su una riga: si accende la colonna nel laboratorio 3D qui sotto.</p>
+    <div class="tbl rv"><table id="freq">
+      <caption>Giudizio di 40 clienti (variabile qualitativa ordinale)</caption>
+      <thead><tr><th>Modalità</th><th>nᵢ<small>quanti</small></th><th>fᵢ<small>quota</small></th><th>pᵢ %<small>percentuale</small></th><th>Nᵢ<small>fino a qui</small></th><th>Fᵢ<small>quota fino a qui</small></th></tr></thead>
+      <tbody>
+        <tr data-i="0"><td><span class="sw" style="background:var(--c1)"></span>Scarso</td><td>4</td><td>0,10</td><td>10%</td><td>4</td><td>0,10</td></tr>
+        <tr data-i="1"><td><span class="sw" style="background:var(--c2)"></span>Sufficiente</td><td>10</td><td>0,25</td><td>25%</td><td>14</td><td>0,35</td></tr>
+        <tr data-i="2"><td><span class="sw" style="background:var(--c3)"></span>Buono</td><td>18</td><td>0,45</td><td>45%</td><td>32</td><td>0,80</td></tr>
+        <tr data-i="3"><td><span class="sw" style="background:var(--c4)"></span>Ottimo</td><td>8</td><td>0,20</td><td>20%</td><td>40</td><td>1,00</td></tr>
+      </tbody>
+      <tfoot><tr><td>Totale</td><td>40</td><td>1,00</td><td>100%</td><td>—</td><td>—</td></tr></tfoot>
+    </table></div>
+    <div class="two">
+      <div class="ex rv"><b>Passo passo: la riga “Sufficiente”</b>
+        <ol class="steps">
+          <li><span>Conto: 10 clienti → <span class="mono">nᵢ = 10</span></span></li>
+          <li><span>Divido per il totale: <span class="mono">10 ÷ 40 = 0,25</span></span></li>
+          <li><span>Moltiplico per 100: <span class="mono">0,25 × 100 = 25%</span></span></li>
+          <li><span>Sommo le righe fino a qui: <span class="mono">4 + 10 = 14</span></span></li>
+        </ol></div>
+      <div class="ex rv"><b>Come si legge a voce</b>«10 clienti, cioè il 25%, hanno risposto Sufficiente. In tutto <strong>14 clienti (35%) hanno dato al massimo Sufficiente</strong>.» Il totale delle cumulate non si scrive: l'ultima riga è già il totale.</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="lab">
+      <div class="stage s3d" id="st-a"><canvas id="cv-a" aria-label="Colonne 3D delle frequenze assolute e cumulate dei 40 giudizi"></canvas><span class="hint">Laboratorio 1 · trascina · passa sopra</span><span class="corner">n = 40</span></div>
+      <div class="card readout rv">
+        <div class="eyebrow">Laboratorio 3D</div>
+        <h3>Da nᵢ a Nᵢ</h3>
+        <p>Premi “Cumulate”: ogni colonna diventa una pila di tutte le righe precedenti. La cumulata è proprio questo, una somma che cresce.</p>
+        <div class="controls" role="group" aria-label="Tipo di frequenza">
+          <button class="btn" id="a-abs" aria-pressed="true">Assolute nᵢ</button>
+          <button class="btn" id="a-cum" aria-pressed="false">Cumulate Nᵢ</button>
+        </div>
+        <div class="legend"><span><i style="background:var(--c1)"></i>Scarso</span><span><i style="background:var(--c2)"></i>Sufficiente</span><span><i style="background:var(--c3)"></i>Buono</span><span><i style="background:var(--c4)"></i>Ottimo</span></div>
+        <p id="a-note" aria-live="polite" style="font-size:.95rem;color:var(--muted)">Altezza = numero di clienti per giudizio.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card warn rv"><span class="lbl-w">Errore comune 1</span><h4>Cumulare dati nominali</h4>
+    <p>«Montaggio + Verniciatura = 60% fino a Verniciatura» non significa nulla: se cambi l'ordine delle righe, cambia il risultato. Per cumulare serve un ordine naturale.</p></div>
+</section>
+
+<!-- ================= SEZIONE B ================= -->
+<section class="part" id="sez-b" data-bg="2">
+  <div class="part-head">
+    <span class="x3d" aria-hidden="true" data-l="B"></span>
+    <div class="eyebrow rv">Sezione <b>B</b> · 2 di 3</div>
+    <h2 class="split">Media, mediana <em class="s">e moda</em></h2>
+    <p class="lead rv">Sono gli <strong>indici di posizione centrale</strong>: un solo numero che “rappresenta” tutti i dati. Ce ne sono tre, e quello sbagliato può raccontare una storia falsa.</p>
+  </div>
+
+  <div class="ex rv"><b>L'esempio che useremo</b>Misuriamo 5 pezzi prodotti: <span class="mono">10, 12, 11, 10, 50</span> mm. Quattro sono normali, il 50 è molto diverso: un <strong>outlier</strong> (valore anomalo), forse un errore di misura.</div>
+
+  <div class="three" style="margin-top:18px">
+    <div class="card lift rv"><span class="tag t2">1 · Media aritmetica</span>
+      <div class="simple"><b>In parole semplici</b><p>Il conto al ristorante diviso in parti uguali: sommi tutto e dividi per quante persone siete.</p></div>
+      <div class="formula">x̄ = <span class="frac"><span>Σ xᵢ</span><span>n</span></span><span class="note">somma di tutti i valori ÷ quanti sono</span></div>
+      <ol class="steps">
+        <li><span>Sommo: <span class="mono">10+12+11+10+50 = 93</span></span></li>
+        <li><span>Divido per 5: <span class="mono">93 ÷ 5 = 18,6</span></span></li>
+      </ol>
+      <p><strong>Usala</strong> con numeri “tranquilli”, senza valori estremi.</p>
+      <p><strong>Attenzione</strong>: un solo outlier la sposta molto. Qui 18,6 non somiglia a nessun pezzo.</p>
+    </div>
+    <div class="card lift rv"><span class="tag t3">2 · Mediana</span>
+      <div class="simple"><b>In parole semplici</b><p>Metti i dati in fila dal più piccolo al più grande e prendi quello <strong>in mezzo</strong>.</p></div>
+      <div class="formula" style="font-size:.95rem;display:grid;gap:8px">
+        <span>n dispari → posto <span class="frac"><span>n+1</span><span>2</span></span></span>
+        <span>n pari → media dei valori ai posti <span class="frac"><span>n</span><span>2</span></span> e <span class="frac"><span>n</span><span>2</span></span>+1</span></div>
+      <ol class="steps">
+        <li><span>Ordino: <span class="mono">10, 10, <u>11</u>, 12, 50</span></span></li>
+        <li><span>5 dati (dispari) → posto (5+1)÷2 = 3°</span></li>
+        <li><span>Il 3° è <strong>11</strong></span></li>
+      </ol>
+      <div class="ex"><b>E con n pari?</b>Aggiungo un 6° pezzo da 13 mm: <span class="mono">10, 10, <u>11</u>, <u>12</u>, 13, 50</span>. 6 dati → posti 6÷2 = 3° e 4°. Mediana = (11 + 12) ÷ 2 = <strong>11,5</strong>.</div>
+      <p><strong>Usala</strong> con outlier o dati sbilanciati, e con giudizi ordinali. È <strong>robusta</strong>: il 50 non la sposta.</p>
+    </div>
+    <div class="card lift rv"><span class="tag t4">3 · Moda</span>
+      <div class="simple"><b>In parole semplici</b><p>Il valore <strong>più popolare</strong>, quello che compare più spesso. Come la taglia più venduta.</p></div>
+      <div class="formula" style="font-size:.95rem">Mo = la modalità con nᵢ più alto</div>
+      <ol class="steps">
+        <li><span>Conto: il 10 compare 2 volte, gli altri 1</span></li>
+        <li><span>Moda = <strong>10</strong></span></li>
+      </ol>
+      <p><strong>Usala</strong> sempre con dati a parole nominali: è l'unico indice possibile.</p>
+      <p><strong>Casi strani</strong>: due valori a pari merito <em>sulla frequenza più alta</em> → <strong>bimodale</strong> (es. <span class="mono">10, 10, 12, 12, 15</span>: mode 10 e 12; spesso due gruppi mescolati, come due turni).</p>
+      <p>Tutti i valori con <strong>la stessa frequenza</strong> → <strong>moda assente</strong> (es. <span class="mono">10, 11, 12, 13</span>). Attenzione: se i dati sono tutti uguali (<span class="mono">10, 10, 10</span>) la moda c'è, ed è 10.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3 class="rv">Quando i dati sono già in tabella</h3>
+    <p class="rv">Nelle esercitazioni spesso non hai l'elenco dei dati ma una tabella di frequenza. I tre indici si calcolano lo stesso.</p>
+    <div class="two">
+      <div class="card rv"><span class="tag t2">Media da tabella (ponderata)</span>
+        <div class="formula">x̄ = <span class="frac"><span>Σ xᵢ · nᵢ</span><span>n</span></span><span class="note">ogni valore pesa per quante volte compare</span></div>
+        <div class="ex"><b>Esempio</b>Difetti per lotto: 0 difetti in 5 lotti, 1 in 3, 2 in 2 (n = 10). x̄ = (0·5 + 1·3 + 2·2) ÷ 10 = 7 ÷ 10 = <strong>0,7</strong> difetti per lotto.</div>
+        <p>Con dati in classi si usa il <strong>valore centrale</strong> di ogni classe al posto di xᵢ: il risultato è un'approssimazione.</p>
+      </div>
+      <div class="card rv"><span class="tag t3">Mediana e moda da tabella</span>
+        <p><strong>Mediana</strong>: calcola il posto centrale, poi scendi nella colonna delle cumulate Nᵢ. La mediana è nella prima riga in cui Nᵢ raggiunge quel posto.</p>
+        <div class="ex"><b>Esempio</b>Stessi lotti, n = 10: posti centrali 5° e 6°. Cumulate: 5, 8, 10. Il 5° è nella riga “0”, il 6° nella riga “1” → mediana = (0 + 1) ÷ 2 = <strong>0,5</strong>.</div>
+        <p><strong>Moda</strong>: la riga con nᵢ più alto, qui “0 difetti”. Con dati in classi si parla di <strong>classe modale</strong> (la classe con densità più alta) e di <strong>classe mediana</strong> (la prima con Fᵢ ≥ 0,5).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="lab">
+      <div class="stage s3d" id="st-b"><canvas id="cv-b" aria-label="Asta in equilibrio: la media è il fulcro arancione, la mediana è il segnaposto verde"></canvas><span class="hint">Laboratorio 2 · sposta l'outlier</span><span class="corner">scala 0–60 mm</span></div>
+      <div class="card readout rv">
+        <div class="eyebrow">Laboratorio 3D</div>
+        <h3>La media è il punto di equilibrio</h3>
+        <p>Ogni tessera è un pezzo. Il <strong style="color:var(--c2)">triangolo arancione</strong> è la media: il punto dove l'asta sta in bilico. Lo <strong style="color:var(--c3)">spillo verde</strong> è la mediana. Sposta il cursore e guarda: la media insegue l'outlier, la mediana resta ferma.</p>
+        <label for="b-out" style="font-size:.95rem">Valore dell'outlier: <output id="b-outv" class="mono">50</output> mm</label>
+        <input type="range" id="b-out" min="12" max="60" step="1" value="50">
+        <div class="controls"><button class="btn" id="b-even" aria-pressed="false">Aggiungi un 6° pezzo (13 mm)</button></div>
+        <div aria-live="polite" style="display:grid;gap:10px">
+          <div class="stat"><span>Dati in fila</span><output id="b-data" style="font-family:var(--f-mono);font-size:.88rem">10 10 11 12 50</output></div>
+          <div class="stat"><span>Media x̄</span><output id="b-mean" style="color:var(--c2)">18,6</output></div>
+          <div class="stat"><span>Mediana</span><output id="b-med" style="color:var(--c3)">11</output></div>
+          <div class="stat"><span>Moda</span><output id="b-mode" style="color:var(--c4)">10</output></div>
+          <p id="b-how" style="font-size:.9rem;color:var(--muted)">5 dati, numero dispari → prendo il 3° della fila.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3 class="rv">Quale indice usare</h3>
+    <div class="tbl rv"><table class="cmp">
+      <thead><tr><th>Che dati hai?</th><th>Media</th><th>Mediana</th><th>Moda</th><th>Scegli</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Parole senza ordine</strong> (nominali)<br><span class="mono" style="color:var(--muted)">reparto, colore</span></td><td class="no">No</td><td class="no">No</td><td class="yes">Sì</td><td>Moda</td></tr>
+        <tr><td><strong>Parole in fila</strong> (ordinali)<br><span class="mono" style="color:var(--muted)">giudizi</span></td><td class="no">No</td><td class="yes">Sì</td><td class="yes">Sì</td><td>Mediana (+ moda)</td></tr>
+        <tr><td><strong>Numeri senza sorprese</strong> (simmetrici)<br><span class="mono" style="color:var(--muted)">diametri sotto controllo</span></td><td class="yes">Sì</td><td class="yes">Sì</td><td class="mid">Poco utile</td><td>Media</td></tr>
+        <tr><td><strong>Numeri con outlier</strong> (asimmetrici)<br><span class="mono" style="color:var(--muted)">stipendi, tempi di consegna</span></td><td class="mid">Fuorviante</td><td class="yes">Sì</td><td class="mid">Poco utile</td><td>Mediana</td></tr>
+      </tbody>
+    </table></div>
+    <div class="ex rv"><b>Campanello d'allarme</b>Se media e mediana sono molto diverse, c'è qualcosa di strano nei dati (outlier o distribuzione sbilanciata). Nel report usa la mediana e vai a controllare i valori estremi.</div>
+  </div>
+
+  <div class="card warn rv"><span class="lbl-w">Errore comune 2</span><h4>Fare la media dei giudizi</h4>
+    <p>Trasformare Scarso=1 … Ottimo=4 e scrivere “media 2,8” sembra furbo, ma presume che il salto tra Scarso e Sufficiente sia uguale a quello tra Buono e Ottimo. Non lo sappiamo. Con i giudizi usa mediana e moda. Nei 40 clienti: il centro della fila è al posto 20,5, che cade nella riga dove Nᵢ supera 20 → <strong>mediana = Buono</strong>.</p></div>
+</section>
+
+<!-- ================= SEZIONE C ================= -->
+<section class="part" id="sez-c" data-bg="3">
+  <div class="part-head">
+    <span class="x3d" aria-hidden="true" data-l="C"></span>
+    <div class="eyebrow rv">Sezione <b>C</b> · 3 di 3</div>
+    <h2 class="split">Scegliere il <em class="s">grafico</em></h2>
+    <p class="lead rv">Il grafico giusto dipende da due domande: che tipo di dato ho? Cosa voglio far capire a chi guarda?</p>
+  </div>
+
+  <div class="block">
+    <div class="card rv">
+      <div class="eyebrow">Strumento</div>
+      <h3>Trova il grafico giusto in due domande</h3>
+      <div class="finder" id="finder">
+        <div class="q"><span>1. I tuoi dati sono…</span><div class="controls" data-q="1">
+          <button class="btn" data-v="parole" aria-pressed="false">Parole (categorie)</button><button class="btn" data-v="numeri" aria-pressed="false">Numeri</button></div></div>
+        <div class="q" id="q2" hidden><span id="q2t">2. Cosa vuoi mostrare?</span><div class="controls" data-q="2"></div></div>
+        <div class="result" id="fres" hidden aria-live="polite"><b id="fres-t"></b><span id="fres-d"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="lab">
+      <div class="stage s3d" id="st-c"><canvas id="cv-c" aria-label="Galleria 3D di tipi di grafico"></canvas><span class="hint">Laboratorio 3 · scegli un grafico</span><span class="corner" id="c-corner">1 / 5</span></div>
+      <div class="card readout rv">
+        <div class="eyebrow">Galleria 3D</div>
+        <div class="controls" role="group" aria-label="Tipo di grafico">
+          <button class="btn" data-mode="bar" aria-pressed="true">Barre</button>
+          <button class="btn" data-mode="hist" aria-pressed="false">Istogramma</button>
+          <button class="btn" data-mode="pie" aria-pressed="false">Torta</button>
+          <button class="btn bad" data-mode="pie15" aria-pressed="false">Torta da 15 ✗</button>
+          <button class="btn" data-mode="line" aria-pressed="false">Linea</button>
+        </div>
+        <div aria-live="polite" style="display:grid;gap:8px"><h3 id="c-title">Grafico a barre</h3><p id="c-text"></p><p id="c-data" class="mono" style="font-size:.82rem;color:var(--muted)"></p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two">
+    <div class="card lift rv"><span class="tag t1">Grafico a barre (o a colonne)</span>
+      <div class="simple"><b>In parole semplici</b><p>Una barra per ogni categoria: più è alta, più è frequente.</p></div>
+      <ul><li><strong>Per</strong>: dati a parole e numeri contati (discreti).</li>
+      <li>Barre <strong>staccate</strong>: le categorie sono separate tra loro.</li>
+      <li>L'asse parte sempre da zero, altrimenti le differenze sembrano più grandi.</li>
+      <li>Nominali: ordina dalla barra più alta. Ordinali: rispetta l'ordine naturale.</li></ul></div>
+    <div class="card lift rv"><span class="tag t3">Istogramma</span>
+      <div class="simple"><b>In parole semplici</b><p>Come le barre, ma per numeri misurati divisi in <strong>intervalli</strong> (classi), es. “da 0 a 2 giorni”. I rettangoli si toccano perché i numeri continuano senza buchi.</p></div>
+      <ul><li><strong>Per</strong>: variabili quantitative continue raggruppate in classi.</li>
+      <li>Conta l'<strong>area</strong>. Se le classi sono larghe in modo diverso, l'altezza è la <strong>densità</strong>:</li></ul>
+      <div class="formula" style="font-size:1rem">dᵢ = <span class="frac"><span>nᵢ</span><span>larghezza della classe</span></span></div></div>
+    <div class="card lift rv"><span class="tag t2">Grafico a torta</span>
+      <div class="simple"><b>In parole semplici</b><p>Una torta divisa in fette: ogni fetta è la quota di un totale che fa 100%.</p></div>
+      <ul><li><strong>Utile</strong> con <strong>poche categorie</strong> (2–5) e quote del totale.</li>
+      <li><strong>Da evitare</strong> con tante categorie, fette simili o per confrontare più torte.</li>
+      <li>L'occhio confronta male gli angoli: per confronti precisi meglio le barre.</li></ul></div>
+    <div class="card lift rv"><span class="tag t4">Linee e serie storiche <small style="text-transform:none;color:var(--muted)">(cenni)</small></span>
+      <div class="simple"><b>In parole semplici</b><p>Punti uniti da una linea per vedere come una grandezza <strong>cambia nel tempo</strong>.</p></div>
+      <ul><li>Il tempo va sull'asse orizzontale, a passi regolari (mesi, trimestri).</li>
+      <li>Fa vedere crescite, cali, stagionalità e picchi strani.</li>
+      <li>Non unire con una linea categorie che non sono in ordine di tempo.</li></ul></div>
+  </div>
+
+  <div class="block">
+    <div class="two">
+      <div class="card warn rv"><span class="lbl-w">Errore comune 3</span><h4>La torta con 15 fette</h4>
+        <p>Con troppe categorie le fette diventano indistinguibili e i colori si ripetono (provala nel laboratorio). Tieni le 4–5 voci principali e raggruppa il resto in “Altro”, oppure usa barre ordinate.</p></div>
+      <div class="card warn rv"><span class="lbl-w">Errore comune 4</span><h4>Barre staccate per dati continui</h4>
+        <p>Mostrare i tempi di consegna con barre staccate fa pensare che ci siano “buchi” tra le classi. Per numeri misurati in classi usa l'istogramma.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3 class="rv">Tabella: quale grafico</h3>
+    <div class="tbl rv"><table class="cmp">
+      <thead><tr><th>Tipo di dato</th><th>Cosa vuoi mostrare</th><th>Grafico</th></tr></thead>
+      <tbody>
+        <tr><td>Parole senza ordine (nominali)</td><td>confrontare categorie</td><td>Barre, dalla più alta</td></tr>
+        <tr><td>Parole, 2–5 categorie</td><td>la quota sul totale</td><td>Torta</td></tr>
+        <tr><td>Parole in fila (ordinali)</td><td>confrontare mantenendo l'ordine</td><td>Barre nell'ordine naturale</td></tr>
+        <tr><td>Numeri contati (discreti)</td><td>come si distribuiscono</td><td>Barre (anche sottili, “a bastoncini”)</td></tr>
+        <tr><td>Numeri misurati (continui)</td><td>la forma della distribuzione</td><td>Istogramma</td></tr>
+        <tr><td>Numeri nel tempo</td><td>andamento, trend</td><td>Linea</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<div class="ring3d" aria-hidden="true" data-text="CONTA · RIASSUMI · DISEGNA · CONTA · RIASSUMI · DISEGNA · "></div>
+
+<!-- ================= RIEPILOGO ================= -->
+<section class="part" id="riepilogo" data-bg="4">
+  <div class="part-head">
+    <div class="eyebrow rv">Promemoria</div>
+    <h2 class="split">Da tenere <em class="s">sul banco</em></h2>
+  </div>
+  <div class="four cheat">
+    <div class="card lift st3d t1"><span class="num">i.</span><div style="display:grid;gap:8px"><span class="q">Parole senza ordine</span><h3>Moda + barre</h3><p>Frequenze e percentuali. Niente cumulate, media o mediana.</p></div></div>
+    <div class="card lift st3d t2"><span class="num">ii.</span><div style="display:grid;gap:8px"><span class="q">Parole in fila</span><h3>Mediana + barre in ordine</h3><p>Cumulate sì. Media no, anche con i numeri al posto delle parole.</p></div></div>
+    <div class="card lift st3d t3"><span class="num">iii.</span><div style="display:grid;gap:8px"><span class="q">Numeri senza sorprese</span><h3>Media + istogramma</h3><p>Se media e mediana sono vicine, puoi fidarti della media.</p></div></div>
+    <div class="card lift st3d t4"><span class="num">iv.</span><div style="display:grid;gap:8px"><span class="q">Numeri con outlier (asimmetrici)</span><h3>Mediana + istogramma</h3><p>Riporta la mediana e controlla i valori estremi.</p></div></div>
+  </div>
+
+  <div class="block">
+    <h3 class="rv">Glossario</h3>
+    <dl class="gloss rv">
+      <div><dt>Unità statistica</dt><dd>La “cosa” su cui raccogli il dato: un cliente, un pezzo, un ordine.</dd></div>
+      <div><dt>Variabile (carattere)</dt><dd>La caratteristica che osservi: giudizio, diametro, reparto.</dd></div>
+      <div><dt>Modalità</dt><dd>Ognuno dei valori che la variabile può assumere: “Buono”, “10 mm”.</dd></div>
+      <div><dt>Frequenza</dt><dd>Quante volte compare una modalità (assoluta) o che quota è del totale (relativa).</dd></div>
+      <div><dt>Cumulata</dt><dd>Somma delle frequenze dalla prima modalità fino a quella considerata.</dd></div>
+      <div><dt>Outlier</dt><dd>Un valore molto lontano dagli altri: errore o caso eccezionale da controllare.</dd></div>
+      <div><dt>Robusto</dt><dd>Un indice che non si lascia spostare dagli outlier, come la mediana.</dd></div>
+      <div><dt>Classe</dt><dd>Un intervallo di valori in cui si raggruppano dati continui, es. 2–4 giorni.</dd></div>
+    </dl>
+  </div>
+</section>
+</main>
+
+<footer class="wrap">
+  <div class="big extrude">Prima il tipo di dato,<br>poi <em class="s">il numero.</em></div>
+  <div>Scheda di lavoro IFTS · Modulo di Statistica · Guida operativa alla Statistica Descrittiva. I dati degli esempi sono inventati a scopo didattico.</div>
+</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+"use strict";
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#888888';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const ease=t=>1-Math.pow(1-clamp(t,0,1),3);
+const easeOutBack=t=>{t=clamp(t,0,1);const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};
+const fmt=v=>(Math.round(v*10)/10).toString().replace('.',',');
+const hasG=!!window.gsap, hasT=!!window.THREE;
+if(hasG&&window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+const fine=matchMedia('(hover:hover) and (pointer:fine)').matches;
+const mouse={nx:0,ny:0,sx:0,sy:0};
+addEventListener('pointermove',e=>{mouse.nx=e.clientX/innerWidth*2-1;mouse.ny=-(e.clientY/innerHeight*2-1);},{passive:true});
+const easeIO=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+let heroIntro=null;
+
+/* ---------- sfondo + nav + progress ---------- */
+const layers=[...document.querySelectorAll('.bgl')];
+const navLinks=[...document.querySelectorAll('nav.top a[data-sec]')];
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;
+  const k=+e.target.dataset.bg; layers.forEach((l,i)=>l.classList.toggle('on',i===k));
+  if(e.target.id) navLinks.forEach(a=>a.classList.toggle('on',a.dataset.sec===e.target.id));}),{rootMargin:'-45% 0px -50% 0px'});
+document.querySelectorAll('[data-bg]').forEach(el=>io.observe(el));
+const progress=document.querySelector('.progress');
+function onScroll(){const max=document.documentElement.scrollHeight-innerHeight; progress.style.transform=`scaleX(${max>0?clamp(scrollY/max,0,1):0})`;}
+addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+/* ---------- quiz: che tipo di variabile ---------- */
+const QZ=[
+  ['Colore dell’auto acquistata','nom','Sono etichette senza ordine: nessun colore viene “prima”.'],
+  ['Taglia della maglietta (S, M, L, XL)','ord','Si mettono in fila, ma non si sa “di quanto” L supera M.'],
+  ['Numero di difetti trovati in un lotto','dis','Si contano: 0, 1, 2… non esiste 2,5 difetti.'],
+  ['Tempo di consegna in giorni (es. 3,7)','con','Si misura: tra 3 e 4 giorni ci sono infiniti valori.'],
+  ['CAP del cliente (es. 30027)','nom','Sembra un numero, ma è un codice: fare la media dei CAP non ha senso.'],
+  ['Livello di soddisfazione (Scarso → Ottimo)','ord','Etichette con un ordine chiaro: è ordinale.']];
+const TYPES={nom:'Nominale',ord:'Ordinale',dis:'Discreta',con:'Continua'};
+const quiz=document.getElementById('quiz');
+QZ.forEach(([q,a,why])=>{const row=document.createElement('div'); row.className='qi';
+  row.innerHTML=`<span>${q}</span><div class="opts" role="group" aria-label="Tipo per: ${q}">${Object.entries(TYPES).map(([v,l])=>`<button class="btn" data-v="${v}">${l}</button>`).join('')}</div><div class="fb" aria-live="polite"></div>`;
+  const fb=row.querySelector('.fb');
+  row.querySelectorAll('button').forEach(b=>b.onclick=()=>{row.querySelectorAll('button').forEach(x=>x.classList.remove('ok','ko'));
+    const ok=b.dataset.v===a; b.classList.add(ok?'ok':'ko'); fb.className='fb '+(ok?'ok':'ko');
+    fb.textContent=ok?'Giusto. '+why:`Non proprio: è ${TYPES[a].toLowerCase()}. ${why}`;
+    if(hasG&&!reduce) gsap.fromTo(fb,{y:-6,opacity:0},{y:0,opacity:1,duration:.4,ease:'power2.out'});});
+  quiz.appendChild(row);});
+
+/* ---------- trova il grafico ---------- */
+const F={parole:{t:'2. Cosa vuoi mostrare?',o:[['confronto','Confrontare le categorie'],['quote','La quota di ognuna sul totale']]},
+         numeri:{t:'2. Che numeri sono?',o:[['contati','Contati (interi, es. n° difetti)'],['misurati','Misurati (es. tempi, misure)'],['tempo','Lo stesso dato nel tempo']]}};
+const R={confronto:['Grafico a barre','Barre staccate, una per categoria. Ordinale? Rispetta l’ordine naturale. Nominale? Dalla più alta alla più bassa. Indice: moda (o mediana se ordinale).'],
+  quote:['Grafico a torta','Solo se le categorie sono poche (2–5). Con di più torna alle barre. Indice: moda.'],
+  contati:['Grafico a barre (a bastoncini)','Una barra per ogni valore possibile. Indice: media se non ci sono outlier, altrimenti mediana.'],
+  misurati:['Istogramma','Raggruppa in classi; rettangoli che si toccano. Indice: media, o mediana se ci sono outlier.'],
+  tempo:['Grafico a linee','Tempo sull’asse orizzontale, a passi regolari. Guarda trend e picchi.']};
+const q2=document.getElementById('q2'), q2t=document.getElementById('q2t'), q2c=q2.querySelector('.controls'), fres=document.getElementById('fres');
+document.querySelectorAll('[data-q="1"] .btn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('[data-q="1"] .btn').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  const f=F[b.dataset.v]; q2t.textContent=f.t; q2c.innerHTML=f.o.map(([v,l])=>`<button class="btn" data-v="${v}" aria-pressed="false">${l}</button>`).join('');
+  q2.hidden=false; fres.hidden=true;
+  if(hasG&&!reduce) gsap.from(q2,{y:12,opacity:0,duration:.5,ease:'expo.out'});
+  q2c.querySelectorAll('.btn').forEach(c=>c.onclick=()=>{q2c.querySelectorAll('.btn').forEach(x=>x.setAttribute('aria-pressed',x===c));
+    const [t,d]=R[c.dataset.v]; document.getElementById('fres-t').textContent=t; document.getElementById('fres-d').textContent=d; fres.hidden=false;
+    if(hasG&&!reduce) gsap.from(fres,{y:12,opacity:0,duration:.5,ease:'expo.out'});});
+});
+
+/* ================= LABORATORI 3D ================= */
+const stages=[];
+const v3=hasT?new THREE.Vector3():null;
+function makeStage(id,{cam=[0,4,9],target=[0,1,0],rotY=-0.35,floorSize=12}={}){
+  const canvas=document.getElementById('cv-'+id), box=document.getElementById('st-'+id);
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+  const scene=new THREE.Scene(); scene.fog=new THREE.Fog(0x0a0f1c,16,34);
+  const camera=new THREE.PerspectiveCamera(36,1,0.1,200);
+  const base=new THREE.Vector3(...cam), tgt=new THREE.Vector3(...target);
+  scene.add(new THREE.HemisphereLight(0xc4d4ff,0x0a0d18,0.7));
+  const key=new THREE.DirectionalLight(0xffffff,1.35); key.position.set(4,11,7); key.castShadow=true;
+  key.shadow.mapSize.set(1024,1024); Object.assign(key.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:1,far:40}); key.shadow.radius=6; key.shadow.bias=-0.0008; scene.add(key);
+  const rimA=new THREE.PointLight(new THREE.Color(css('--c1')),2.2,26); rimA.position.set(-7,5,-5); scene.add(rimA);
+  const rimB=new THREE.PointLight(new THREE.Color(css('--c2')),1.6,26); rimB.position.set(7,3,-4); scene.add(rimB);
+  const root=new THREE.Group(); root.rotation.y=rotY; scene.add(root);
+  const fl=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.ShadowMaterial({opacity:.42})); fl.rotation.x=-Math.PI/2; fl.receiveShadow=true; root.add(fl);
+  const grid=new THREE.GridHelper(floorSize,floorSize,0x3a4a78,0x1f2a48); grid.material.transparent=true; grid.material.opacity=.55; grid.position.y=.002; root.add(grid);
+  const tip=document.createElement('div'); tip.className='tip'; box.appendChild(tip);
+  const st={id,canvas,box,renderer,scene,camera,root,tip,visible:false,started:0,introP:reduce?1:0,introMs:reduce?1e6:0,
+    hoverables:[],hit:null,mx:0,my:0,tmx:0,tmy:0,dragRY:0,dragRX:0,swing:0,base,tgt,k:1,w:1,h:1,
+    hot:m=>m===st.hit,onHover:null,update:null,
+    mat(token,opts={}){const col=new THREE.Color(css(token));
+      return new THREE.MeshPhysicalMaterial(Object.assign({color:col,roughness:.3,metalness:.08,clearcoat:.8,clearcoatRoughness:.2,emissive:col.clone(),emissiveIntensity:0},opts));},
+    label(text,cls){const el=document.createElement('span'); el.className='lbl'+(cls?' '+cls:''); el.textContent=text; box.appendChild(el); return el;},
+    add(m,hover=true){m.castShadow=true; m.receiveShadow=true; if(hover) st.hoverables.push(m); return m;}
+  };
+  const ptr=new THREE.Vector2(9,9), ray=new THREE.Raycaster(); let px=0,py=0,inside=false,drag=null;
+  canvas.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,ry:st.dragRY,rx:st.dragRX}; canvas.setPointerCapture(e.pointerId);});
+  canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect(); px=e.clientX-r.left; py=e.clientY-r.top; inside=true;
+    ptr.set(px/r.width*2-1,-(py/r.height*2-1)); st.tmx=ptr.x; st.tmy=ptr.y;
+    if(drag){st.dragRY=drag.ry+(e.clientX-drag.x)*0.01; st.dragRX=clamp(drag.rx+(e.clientY-drag.y)*0.005,-0.25,0.4);}});
+  const end=()=>drag=null; canvas.addEventListener('pointerup',end); canvas.addEventListener('pointercancel',end);
+  canvas.addEventListener('pointerleave',()=>{inside=false; st.tmx=0; st.tmy=0; ptr.set(9,9);});
+  function resize(){const w=canvas.clientWidth,h=canvas.clientHeight; if(!w||!h)return; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); st.k=clamp(1.4/camera.aspect,1,2.2); st.w=w; st.h=h;}
+  new ResizeObserver(resize).observe(canvas); resize();
+  new IntersectionObserver(es=>es.forEach(e=>{st.visible=e.isIntersecting; if(e.isIntersecting&&e.intersectionRatio>.3&&!st.started) st.started=performance.now();}),{threshold:[0,.3,.6]}).observe(canvas);
+  st.frame=now=>{
+    if(st.started&&!reduce){st.introMs=now-st.started; st.introP=clamp(st.introMs/1800,0,1);}
+    st.mx=lerp(st.mx,st.tmx,.06); st.my=lerp(st.my,st.tmy,.06); st.swing=lerp(st.swing,0,.04);
+    const e=ease(st.introP), dist=st.k*(1+(1-e)*1.1);
+    camera.position.copy(st.base).sub(st.tgt).multiplyScalar(dist).add(st.tgt);
+    camera.position.x+=st.mx*1.2; camera.position.y+=st.my*.8+(1-e)*2.5; camera.lookAt(st.tgt);
+    root.rotation.y=rotY+st.dragRY+st.swing+(1-e)*-.9; root.rotation.x=st.dragRX;
+    let hit=null; if(inside&&!drag){ray.setFromCamera(ptr,camera); const h=ray.intersectObjects(st.hoverables,false)[0]; hit=h?h.object:null;}
+    if(hit!==st.hit){st.hit=hit; st.onHover&&st.onHover(hit); if(hit&&hit.userData.tip) tip.innerHTML=typeof hit.userData.tip==='function'?hit.userData.tip():hit.userData.tip;}
+    tip.classList.toggle('show',!!(hit&&hit.userData.tip));
+    if(hit){tip.style.left=px+'px'; tip.style.top=py+'px'; const tw=tip.offsetWidth; if(px+tw+30>st.w) tip.style.left=(px-tw-36)+'px';}
+    st.hoverables.forEach(m=>{m.material.emissiveIntensity=lerp(m.material.emissiveIntensity,st.hot(m)?.55:0,.15);});
+    st.update&&st.update(now);
+    renderer.render(scene,camera);
+  };
+  stages.push(st); return st;
+}
+function place(st,el,obj,dy=0){obj.getWorldPosition(v3); v3.y+=dy; v3.project(st.camera); el.style.transform=`translate(${(v3.x+1)/2*st.w}px,${(1-v3.y)/2*st.h}px) translate(-50%,-50%)`;}
+function boxGeo(w,h,d){const g=new THREE.BoxGeometry(w,h,d); g.translate(0,h/2,0); return g;}
+function roundBox(w,h,d,r=.06){const s=new THREE.Shape(), x=-w/2, y=-d/2;
+  s.moveTo(x+r,y); s.lineTo(x+w-r,y); s.quadraticCurveTo(x+w,y,x+w,y+r); s.lineTo(x+w,y+d-r); s.quadraticCurveTo(x+w,y+d,x+w-r,y+d);
+  s.lineTo(x+r,y+d); s.quadraticCurveTo(x,y+d,x,y+d-r); s.lineTo(x,y+r); s.quadraticCurveTo(x,y,x+r,y);
+  const g=new THREE.ExtrudeGeometry(s,{depth:h,bevelEnabled:false,curveSegments:4}); g.rotateX(-Math.PI/2); return g;}
+
+if(hasT){
+/* ---------- LAB A ---------- */
+(function(){
+  const st=makeStage('a',{cam:[0,4.8,11.5],target:[0,2,0],rotY:-0.45});
+  const n=[4,10,18,8], names=['Scarso','Sufficiente','Buono','Ottimo'], toks=['--c1','--c2','--c3','--c4'], K=.1, N=40;
+  const cols=[]; let cum=false, forced=-1, hov=-1;
+  for(let i=0;i<4;i++){
+    const g=new THREE.Group(); g.position.x=(i-1.5)*1.75; st.root.add(g);
+    const segs=[];
+    for(let j=0;j<=i;j++){const m=st.add(new THREE.Mesh(roundBox(1.15,1,1.15,.12),st.mat(toks[j]))); m.scale.y=.0001;
+      m.userData={i,j,th:0,ty:0,tip:()=>{const Ni=n.slice(0,i+1).reduce((a,b)=>a+b,0);
+        return `<b>${names[i]}</b>${n[i]} clienti su 40 · ${Math.round(n[i]/N*100)}%<br>fino a qui: ${Ni} clienti (${Math.round(Ni/N*100)}%)`+(cum&&j!==i?`<br><span>questo strato: ${names[j]} (${n[j]})</span>`:'');}};
+      g.add(m); segs.push(m);}
+    const top=new THREE.Object3D(); g.add(top);
+    cols.push({g,segs,top,lbl:st.label(''),lift:0});
+  }
+  const rows=[...document.querySelectorAll('#freq tbody tr')];
+  rows.forEach(r=>{r.addEventListener('pointerenter',()=>forced=+r.dataset.i); r.addEventListener('pointerleave',()=>forced=-1);});
+  st.onHover=o=>{hov=o?o.userData.i:-1;};
+  st.hot=m=>m.userData.i===(hov>=0?hov:forced);
+  function targets(){cols.forEach((c,i)=>c.segs.forEach(s=>{const j=s.userData.j;
+      if(!cum){s.userData.th=(i===j)?n[i]*K:.0001; s.userData.ty=0;} else {s.userData.th=n[j]*K; s.userData.ty=n.slice(0,j).reduce((a,b)=>a+b,0)*K;}}));
+    let acc=0; cols.forEach((c,i)=>{acc+=n[i]; c.lbl.textContent=cum?`Nᵢ ${acc} · ${Math.round(acc/N*100)}%`:`nᵢ ${n[i]} · ${Math.round(n[i]/N*100)}%`;});
+    document.getElementById('a-note').textContent=cum?'Ogni colonna impila tutte le righe fino a quella. L’ultima arriva sempre al totale: 40 clienti, 100%.':'Altezza = numero di clienti per giudizio.';}
+  targets();
+  const bA=document.getElementById('a-abs'), bC=document.getElementById('a-cum');
+  function set(c){if(cum===c)return; cum=c; bA.setAttribute('aria-pressed',!c); bC.setAttribute('aria-pressed',c); targets(); st.swing=c?.5:-.5;}
+  bA.onclick=()=>set(false); bC.onclick=()=>set(true);
+  st.update=()=>{
+    const active=hov>=0?hov:forced;
+    rows.forEach((r,i)=>r.classList.toggle('on',i===active));
+    cols.forEach((c,i)=>{const gi=reduce?1:easeOutBack((st.introMs-300-i*160)/900);
+      c.lift=lerp(c.lift,i===active?.3:0,.12); c.g.position.y=c.lift;
+      let top=0;
+      c.segs.forEach((s,k)=>{const lag=reduce?1:.085-k*.012; s.scale.y=Math.max(.0001,lerp(s.scale.y,s.userData.th*Math.max(gi,0),lag)); s.position.y=lerp(s.position.y,s.userData.ty*Math.max(gi,0),lag); top=Math.max(top,s.position.y+s.scale.y);});
+      c.top.position.y=top; place(st,c.lbl,c.top,.45); c.lbl.classList.toggle('on',i===active); c.lbl.style.opacity=clamp(gi,0,1);});
+  };
+})();
+
+/* ---------- LAB B ---------- */
+(function(){
+  const st=makeStage('b',{cam:[0,3.6,11.5],target:[0,1.2,0],rotY:-0.3,floorSize:14});
+  const X=v=>v/60*11-5.5;
+  const tilt=new THREE.Group(); tilt.position.y=1.3; st.root.add(tilt);
+  const beam=st.add(new THREE.Mesh(roundBox(11.8,.16,1.15,.08),st.mat('--dim',{color:new THREE.Color('#9aa6c8'),roughness:.45})),false); beam.position.y=-.16; tilt.add(beam);
+  const ticks=[];
+  for(let v=0;v<=60;v+=10){const t=new THREE.Mesh(boxGeo(.03,.015,1.18),new THREE.MeshBasicMaterial({color:0x2a3352})); t.position.set(X(v),0,0); tilt.add(t);
+    const o=new THREE.Object3D(); o.position.set(X(v),-.1,.85); tilt.add(o); ticks.push([st.label(String(v),'tick'),o]);}
+  let even=false, meanT=18.6, medT=11;
+  const fulcrum=st.add(new THREE.Mesh(new THREE.ConeGeometry(.5,1.14,4),st.mat('--c2',{metalness:.3}))); fulcrum.position.set(X(18.6),.57,0); fulcrum.rotation.y=Math.PI/4; st.root.add(fulcrum);
+  fulcrum.userData.tip=()=>`<b>Media = ${fmt(meanT)}</b>Il punto di equilibrio dell'asta. Si sposta se un pezzo è molto lontano dagli altri.`;
+  const pin=new THREE.Group(); const stick=new THREE.Mesh(boxGeo(.05,1.6,.05),st.mat('--c3')); stick.castShadow=true;
+  const head=st.add(new THREE.Mesh(new THREE.SphereGeometry(.2,28,18),st.mat('--c3',{metalness:.2}))); head.position.y=1.7; pin.add(stick,head); pin.position.set(X(11),0,-.45); tilt.add(pin);
+  head.userData.tip=()=>`<b>Mediana = ${fmt(medT)}</b>Metà dei pezzi sta a sinistra, metà a destra. L'outlier non la sposta.`;
+  const meanA=new THREE.Object3D(); st.root.add(meanA);
+  const medA=new THREE.Object3D(); head.add(medA); medA.position.y=.55;
+  const meanEl=st.label(''), medEl=st.label(''); meanEl.style.borderColor='var(--c2)'; medEl.style.borderColor='var(--c3)';
+  const vals=[10,12,11,10,13,50];
+  const tiles=vals.map((v,i)=>{const m=st.add(new THREE.Mesh(roundBox(.16,.44,.85,.04),st.mat(i===5?'--warn':'--c1')));
+    m.position.set(X(v),reduce?0:6,0); m.userData={i,tx:X(v),ty:0,vy:0,tip:()=>`<b>Pezzo ${i+1}: ${vals[i]} mm</b>`+(i===5&&vals[5]>20?'<span>outlier: tira la media verso destra</span>':'<span>valore nella norma</span>')}; tilt.add(m); return m;});
+  const slider=document.getElementById('b-out'), evenBtn=document.getElementById('b-even');
+  function rebuild(){
+    vals[5]=+slider.value; document.getElementById('b-outv').textContent=vals[5];
+    const data=vals.filter((v,i)=>i!==4||even), s=data.slice().sort((a,b)=>a-b), n=s.length;
+    meanT=data.reduce((a,b)=>a+b,0)/n; medT=n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;
+    const cnt={}; data.forEach(v=>cnt[v]=(cnt[v]||0)+1); const mx=Math.max(...Object.values(cnt)); const modes=Object.keys(cnt).filter(k=>cnt[k]===mx).map(Number);
+    document.getElementById('b-data').textContent=s.join('  ');
+    document.getElementById('b-mean').textContent=fmt(meanT);
+    document.getElementById('b-med').textContent=fmt(medT);
+    document.getElementById('b-mode').textContent=mx===1?'assente':modes.join(' e ')+(modes.length>1?' (bimodale)':'');
+    document.getElementById('b-how').textContent=n%2?`${n} dati, numero dispari → prendo il ${(n+1)/2}° della fila.`:`${n} dati, numero pari → faccio la media dei due centrali (${n/2}° e ${n/2+1}°): (${s[n/2-1]} + ${s[n/2]}) ÷ 2 = ${fmt(medT)}.`;
+    const seen={};
+    tiles.forEach((m,i)=>{const on=i!==4||even; m.visible=on; if(!on)return; const k=seen[vals[i]]=(seen[vals[i]]||0)+1; m.userData.tx=X(vals[i]); m.userData.ty=(k-1)*.48;});
+  }
+  slider.addEventListener('input',rebuild);
+  evenBtn.onclick=()=>{even=!even; evenBtn.setAttribute('aria-pressed',even); evenBtn.textContent=even?'Togli il 6° pezzo':'Aggiungi un 6° pezzo (13 mm)'; if(even&&!reduce) tiles[4].position.y=4; rebuild();};
+  rebuild();
+  let tv=0;
+  st.update=()=>{
+    const fx=X(meanT);
+    fulcrum.position.x=lerp(fulcrum.position.x,fx,reduce?1:.045);
+    const want=clamp(-(fx-fulcrum.position.x)*.2,-.24,.24);
+    tv+=(want-tilt.rotation.z)*.12; tv*=.82; if(!reduce) tilt.rotation.z+=tv;
+    pin.position.x=lerp(pin.position.x,X(medT),reduce?1:.1);
+    tiles.forEach((m,i)=>{if(!m.visible)return; const go=reduce||st.introMs>500+i*170;
+      m.position.x=lerp(m.position.x,m.userData.tx,reduce?1:.12);
+      if(go){const dy=m.userData.ty-m.position.y; if(reduce){m.position.y=m.userData.ty;} else {m.userData.vy=(m.userData.vy+dy*.09)*.78; m.position.y+=m.userData.vy;}}});
+    const pe=reduce?1:ease((st.introMs-900)/800); pin.scale.set(1,Math.max(.001,pe),1); fulcrum.scale.setScalar(Math.max(.001,reduce?1:ease((st.introMs-200)/700)));
+    meanA.position.set(fulcrum.position.x,-.15,.9);
+    meanEl.textContent='media '+fmt(meanT); medEl.textContent='mediana '+fmt(medT);
+    place(st,meanEl,meanA); place(st,medEl,medA); meanEl.style.opacity=pe; medEl.style.opacity=pe;
+    meanEl.classList.toggle('on',st.hit===fulcrum); medEl.classList.toggle('on',st.hit===head);
+    ticks.forEach(([el,o])=>place(st,el,o));
+  };
+})();
+
+/* ---------- LAB C ---------- */
+(function(){
+  const st=makeStage('c',{cam:[0,5.2,11.5],target:[0,1.4,0],rotY:-0.4});
+  const pal=['--c1','--c2','--c3','--c4'];
+  const MON=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+  const modes={
+    bar:{title:'Grafico a barre',text:'Dato a parole: il tipo di difetto. Una barra per categoria, staccate tra loro e ordinate dalla più frequente. Si vede subito che “Graffio” è il problema principale.',data:'Graffio 14 · Vernice 11 · Ammaccatura 9 · Saldatura 6 · Altro 3',
+      build(g){const L=['Graffio','Vernice','Ammaccatura','Saldatura','Altro'];[14,11,9,6,3].forEach((v,i)=>{const m=st.add(new THREE.Mesh(roundBox(1.05,v*.24,1.05,.12),st.mat(i===0?'--c2':'--c1')));
+        m.position.x=(i-2)*1.75; m.userData.tip=`<b>${L[i]}</b>${v} pezzi · ${Math.round(v/43*100)}% degli scarti`; g.add(m);});}},
+    hist:{title:'Istogramma',text:'Numero misurato: giorni di consegna, divisi in intervalli. I rettangoli si toccano. Gli ultimi due intervalli sono larghi il doppio, quindi l’altezza è la densità (ordini ÷ larghezza): così l’area resta giusta.',data:'0–2: 8 · 2–4: 14 · 4–6: 10 · 6–10: 8 · 10–14: 4 ordini',
+      build(g){const cl=[[0,2,8],[2,4,14],[4,6,10],[6,10,8],[10,14,4]], s=.68;
+        cl.forEach(([a,b,n],i)=>{const w=(b-a)*s, d=n/(b-a); const m=st.add(new THREE.Mesh(boxGeo(w-.015,d*.62,1.8),st.mat(i%2?'--c3':'--c1')));
+          m.position.x=(a+b)/2*s-14*s/2; m.userData.tip=`<b>Da ${a} a ${b} giorni</b>${n} ordini<br>larghezza ${b-a} → densità ${fmt(d)}`; g.add(m);});}},
+    pie:{title:'Grafico a torta',text:'Quote di un totale con poche categorie: le vendite per canale fanno 100%. Quattro fette si leggono al volo. Passa sopra una fetta per estrarla.',data:'Negozio 45% · Online 25% · Rivenditori 20% · Altro 10%',
+      build(g){pie(g,[45,25,20,10],['Negozio','Online','Rivenditori','Altro']);}},
+    pie15:{title:'Da evitare: torta da 15 fette',text:'Le stesse vendite divise per 15 punti vendita. Fette sottili e simili, colori ripetuti: impossibile confrontarle. Meglio barre ordinate, o le prime 4 voci + “Altro”.',data:'15 categorie tra il 3% e il 12%',
+      build(g){pie(g,[12,10,9,8,8,7,7,6,6,6,5,5,4,4,3],null);}},
+    line:{title:'Grafico a linee',text:'Pezzi prodotti ogni mese, da gennaio a dicembre. Il tempo scorre da sinistra a destra: si vedono il calo di agosto e la ripresa in autunno. Passa sui punti.',data:'G 42 · F 45 · M 48 · A 47 · M 52 · G 55 · L 50 · A 28 · S 53 · O 58 · N 60 · D 51 (×100)',
+      build(g){const v=[42,45,48,47,52,55,50,28,53,58,60,51]; const pts=v.map((y,i)=>new THREE.Vector3((i-5.5)*.9,y*.058,0));
+        const tube=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,false,'centripetal'),200,.065,12),st.mat('--c1',{emissiveIntensity:.25})); tube.castShadow=true; g.add(tube);
+        pts.forEach((p,i)=>{const s=st.add(new THREE.Mesh(new THREE.SphereGeometry(.16,24,16),st.mat(i===7?'--warn':'--c2'))); s.position.copy(p); s.userData.tip=`<b>${MON[i]}</b>${v[i]*100} pezzi`+(i===7?'<br><span>calo estivo</span>':''); g.add(s);
+          const d=new THREE.Mesh(boxGeo(.02,p.y,.02),new THREE.MeshBasicMaterial({color:0x2a3352})); d.position.set(p.x,0,0); g.add(d);});}}
+  };
+  const order=['bar','hist','pie','pie15','line'];
+  function pie(g,vals,names){const tot=vals.reduce((a,b)=>a+b,0); let a=0;
+    vals.forEach((v,i)=>{const th=v/tot*Math.PI*2, mid=a+th/2; const geo=new THREE.CylinderGeometry(2.8,2.8,.6,64,1,false,a,th-.012); geo.translate(0,.3,0);
+      const m=st.add(new THREE.Mesh(geo,st.mat(pal[i%4]))); m.userData.dir=new THREE.Vector3(Math.sin(mid),0,Math.cos(mid)); m.userData.base=vals.length<6?.12:.02;
+      m.userData.tip=names?`<b>${names[i]}</b>${v}% del totale`:`<b>Punto vendita ${i+1}</b>${v}%: riesci a distinguerla dalle vicine?`;
+      m.userData.lift=names?(.55-i*.13):0; g.add(m); a+=th;});}
+  let group=null, born=0, outs=[];
+  const btns=[...document.querySelectorAll('#sez-c [data-mode]')];
+  function show(mode){const M=modes[mode];
+    if(group){const old=group; old.userData.dying=performance.now(); outs.push(old); st.hoverables=st.hoverables.filter(m=>m.parent!==old);}
+    group=new THREE.Group(); M.build(group); st.root.add(group);
+    group.children.forEach((c,i)=>{c.userData.delay=i*55; c.userData.sy=1+(c.userData.lift||0); c.scale.y=reduce?c.userData.sy:.0001;});
+    btns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===mode));
+    document.getElementById('c-corner').textContent=`${order.indexOf(mode)+1} / 5`;
+    const tt=document.getElementById('c-title'), tx=document.getElementById('c-text'), td=document.getElementById('c-data');
+    tt.textContent=M.title; tx.textContent=M.text; td.textContent=M.data;
+    if(born&&hasG&&!reduce) gsap.fromTo([tt,tx,td],{y:12,opacity:0},{y:0,opacity:1,duration:.6,stagger:.06,ease:'expo.out'});
+    if(born) st.swing=.6;
+    born=performance.now();}
+  btns.forEach(b=>b.onclick=()=>show(b.dataset.mode));
+  show('bar'); born=0;
+  st.update=now=>{
+    outs=outs.filter(o=>{const p=clamp((now-o.userData.dying)/450,0,1); o.scale.setScalar(Math.max(.001,1-ease(p))); o.rotation.y=p*.6; if(p>=1){st.root.remove(o);return false;} return true;});
+    const t0=born||(st.started?st.started+300:0);
+    group.children.forEach(c=>{const u=c.userData; if(u.sy===undefined)return;
+      const p=reduce?1:(t0?easeOutBack((now-t0-u.delay)/750):0);
+      const sc=Math.max(.0001,u.sy*clamp(p,0,1.2));
+      if(u.dir){const off=(u.base||0)+(st.hit===c?.55:0); u.o=lerp(u.o||0,off,.12); c.position.set(u.dir.x*u.o,st.hit===c?.15:0,u.dir.z*u.o); c.scale.y=sc;}
+      else if(c.geometry.type==='SphereGeometry'){u.l2=lerp(u.l2||0,st.hit===c?.25:0,.15); c.scale.setScalar(Math.max(.0001,clamp(p,0,1.2))*(1+u.l2*2));}
+      else{c.scale.y=sc; if(u.tip){u.l2=lerp(u.l2||0,st.hit===c?.2:0,.15); c.position.y=u.l2;}}
+    });
+  };
+})();
+}
+
+/* ================= HERO 3D: 40 cubi ================= */
+let hero=null;
+if(hasT)(function(){
+  const sec=document.getElementById('top'), canvas=document.getElementById('cv-hero'), tip=document.getElementById('hero-tip');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.15;
+  const scene=new THREE.Scene(); scene.fog=new THREE.Fog(0x070a12,20,44);
+  const camera=new THREE.PerspectiveCamera(38,1,.1,200);
+  scene.add(new THREE.HemisphereLight(0xc4d4ff,0x0a0d18,.6));
+  const key=new THREE.DirectionalLight(0xffffff,1.45); key.position.set(5,13,8); key.castShadow=true; key.shadow.mapSize.set(2048,2048);
+  Object.assign(key.shadow.camera,{left:-11,right:11,top:11,bottom:-11,near:1,far:50}); key.shadow.radius=8; key.shadow.bias=-.0006; scene.add(key);
+  const rimA=new THREE.PointLight(new THREE.Color(css('--c1')),3,32); rimA.position.set(-8,6,-6); scene.add(rimA);
+  const rimB=new THREE.PointLight(new THREE.Color(css('--c2')),2.4,32); rimB.position.set(8,4,-4); scene.add(rimB);
+  const roam=new THREE.PointLight(new THREE.Color(css('--c4')),2,18); scene.add(roam);
+  const fl=new THREE.Mesh(new THREE.PlaneGeometry(90,90),new THREE.ShadowMaterial({opacity:.45})); fl.rotation.x=-Math.PI/2; fl.receiveShadow=true; scene.add(fl);
+  const grid=new THREE.GridHelper(34,34,0x2c3a66,0x151d34); grid.material.transparent=true; grid.material.opacity=.5; scene.add(grid);
+  const N=40, grp=i=>i<4?0:i<14?1:i<32?2:3, NAMES=['Scarso','Sufficiente','Buono','Ottimo'];
+  const COL=['--c1','--c2','--c3','--c4'].map(t=>new THREE.Color(css(t)));
+  const V=THREE.Vector3, geo=roundBox(1,1,1,.14);
+  const cubes=[];
+  for(let i=0;i<N;i++){const m=new THREE.Mesh(geo,new THREE.MeshPhysicalMaterial({color:COL[0].clone(),roughness:.26,metalness:.12,clearcoat:1,clearcoatRoughness:.12,emissive:new THREE.Color(0)}));
+    m.castShadow=true; m.receiveShadow=true; m.userData={i,h:0}; scene.add(m); cubes.push(m);}
+  const F=[[],[],[],[]];
+  for(let i=0;i<N;i++){const c=i%8,r=Math.floor(i/8),x=(c-3.5)*.95,z=(r-2)*.95,h=.35+3.6*Math.exp(-x*x/4.5)*Math.exp(-z*z/5);
+    F[0].push({p:new V(x,0,z),s:new V(.78,h,.78),r:0,c:COL[0].clone().lerp(COL[1],clamp((h-.35)/3.6,0,1)),e:0});}
+  const cnt=[0,0,0,0];
+  for(let i=0;i<N;i++){const g=grp(i),m=cnt[g]++,lvl=Math.floor(m/4),q=m%4;
+    F[1].push({p:new V((g-1.5)*2.1+(q%2-.5)*.62,lvl*.62,(Math.floor(q/2)-.5)*.62),s:new V(.56,.56,.56),r:0,c:COL[g].clone(),e:0});}
+  for(let i=0;i<N;i++){const a=(i-19.5)/39*2.2,med=i===19||i===20;
+    F[2].push({p:new V(Math.sin(a)*7,med?.35:0,-Math.cos(a)*7+4.6),s:new V(.24,med?2:1.05,.7),r:-a,c:COL[grp(i)].clone(),e:med?.55:0});}
+  const share=[4,10,18,8], start=[0,4,14,32];
+  for(let i=0;i<N;i++){const g=grp(i),a=(i+.5)/N*Math.PI*2,mid=(start[g]+share[g]/2)/N*Math.PI*2,ex=g===2?.6:.18;
+    F[3].push({p:new V(Math.sin(a)*3.4+Math.sin(mid)*ex,0,Math.cos(a)*3.4+Math.cos(mid)*ex),s:new V(.5,g===2?1:.55,1.5),r:a,c:COL[g].clone(),e:0});}
+  // simboli fluttuanti
+  const SY=['Σ','x̄','n','Me','Mo','%','fᵢ','Nᵢ'], SC=['--c2','--c1','--c3','--c4'];
+  function symTex(t,c){const cv=document.createElement('canvas'); cv.width=cv.height=256; const g=cv.getContext('2d');
+    g.fillStyle=css(c); g.textAlign='center'; g.textBaseline='middle'; g.font='italic 168px "Instrument Serif", Georgia, serif'; g.shadowColor=css(c); g.shadowBlur=18; g.fillText(t,128,140); return new THREE.CanvasTexture(cv);}
+  const planes=SY.map((t,i)=>{const pl=new THREE.Mesh(new THREE.PlaneGeometry(1.7,1.7),new THREE.MeshBasicMaterial({map:symTex(t,SC[i%4]),transparent:true,depthWrite:false,opacity:.9,side:THREE.DoubleSide}));
+    pl.userData={a:i/SY.length*Math.PI*2,r:7.5+(i%3)*1.5,y:3.2+(i%4)*.9,s:.12+(i%3)*.04}; scene.add(pl); return pl;});
+  if(document.fonts) document.fonts.ready.then(()=>planes.forEach((pl,i)=>{pl.material.map.dispose(); pl.material.map=symTex(SY[i],SC[i%4]); pl.material.needsUpdate=true;}));
+  // polvere
+  const dg=new THREE.BufferGeometry(), dp=new Float32Array(500*3); for(let i=0;i<500;i++){dp[i*3]=(Math.random()-.5)*36;dp[i*3+1]=Math.random()*12;dp[i*3+2]=(Math.random()-.5)*36;}
+  dg.setAttribute('position',new THREE.BufferAttribute(dp,3));
+  const dust=new THREE.Points(dg,new THREE.PointsMaterial({color:0xaabbff,size:.06,transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending})); scene.add(dust);
+  const ovs=[...sec.querySelectorAll('.ov')], dots=[...sec.querySelectorAll('.dots li')];
+  const ptr=new THREE.Vector2(9,9), ray=new THREE.Raycaster(); let px=0,py=0,hovI=-1,vis=true,w=1,h=1,cmx=0,cmy=0;
+  canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect(); px=e.clientX-r.left; py=e.clientY-r.top; ptr.set(px/r.width*2-1,-(py/r.height*2-1));});
+  canvas.addEventListener('pointerleave',()=>ptr.set(9,9));
+  function resize(){w=canvas.clientWidth; h=canvas.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();}
+  addEventListener('resize',resize); resize();
+  new IntersectionObserver(es=>es.forEach(e=>vis=e.isIntersecting)).observe(sec);
+  let lastSeg=-1, curSF=0;
+  hero={frame(now){
+    if(!vis) return;
+    const r=sec.getBoundingClientRect(), p=clamp(-r.top/(r.height-innerHeight),0,1);
+    curSF=lerp(curSF,p*3,reduce?1:.12); const sf=curSF;
+    const seg=Math.min(2,Math.floor(sf)); const t=clamp((sf-seg-.18)/.66,0,1);
+    const intro=heroIntro===null?(reduce?1e9:0):now-heroIntro, T=now/1000;
+    let hit=-1; if(ptr.x<5){ray.setFromCamera(ptr,camera); const x=ray.intersectObjects(cubes,false)[0]; if(x) hit=x.object.userData.i;}
+    if(hit!==hovI){hovI=hit; if(hit>=0){const g=grp(hit); tip.innerHTML=`<b>Cliente ${hit+1}</b>Giudizio: ${NAMES[g]}`+(seg>=1&&Math.round(sf)===2?`<br><span>${hit+1}° nella fila${hit===19||hit===20?' · centro = mediana':''}</span>`:'');}}
+    tip.classList.toggle('show',hovI>=0); if(hovI>=0){tip.style.left=px+'px'; tip.style.top=py+'px';}
+    cubes.forEach((m,i)=>{const A=F[seg][i],B=F[seg+1][i]; const ti=easeIO(clamp((t-(i/N)*.3)/.7,0,1)), arc=Math.sin(Math.PI*ti);
+      m.position.lerpVectors(A.p,B.p,ti); m.position.y+=arc*1.8;
+      m.scale.lerpVectors(A.s,B.s,ti); m.rotation.y=lerp(A.r,B.r,ti)+(reduce?0:arc*Math.PI*.6); m.rotation.x=reduce?0:arc*.5;
+      m.material.color.copy(A.c).lerp(B.c,ti);
+      m.userData.h=lerp(m.userData.h,i===hovI?1:0,.15);
+      m.material.emissive.copy(m.material.color).multiplyScalar(lerp(A.e,B.e,ti)+m.userData.h*.5);
+      m.position.y+=m.userData.h*.45;
+      if(!reduce){const di=clamp((intro-i*30)/1000,0,1); m.position.y+=(1-ease(di))*14; m.rotation.z=(1-ease(di))*2; m.position.y+=Math.sin(T*1.3+i*.7)*.035;}
+    });
+    planes.forEach((pl,i)=>{const u=pl.userData,a=u.a+(reduce?0:T*u.s); pl.position.set(Math.cos(a)*u.r,u.y+(reduce?0:Math.sin(T+i)*.35),Math.sin(a)*u.r); pl.lookAt(camera.position);
+      pl.material.opacity=.85*clamp((intro-600)/1200,0,1);});
+    dust.rotation.y=reduce?0:T*.02;
+    cmx=lerp(cmx,fine?mouse.nx:0,.05); cmy=lerp(cmy,fine?mouse.ny:0,.05);
+    const wide=camera.aspect>1.15, ang=-.62+sf/3*1.7+cmx*.22, rad=(camera.aspect<1?20:14.5)-sf*.5, ht=6.6-sf*.75+cmy*1.1;
+    camera.position.set(Math.sin(ang)*rad,ht,Math.cos(ang)*rad);
+    const tx=wide?-2.4*(1-Math.min(1,sf))+(-1.6*Math.min(1,sf)):0;
+    camera.lookAt(new THREE.Vector3(tx*Math.cos(ang),1.3,-tx*Math.sin(ang)));
+    roam.position.set(Math.sin(T*.6)*6,3,Math.cos(T*.6)*6);
+    ovs.forEach((o,k)=>{const d=sf-k, op=clamp(1-Math.abs(d)*2.6+.3,0,1);
+      o.style.opacity=op; o.style.transform=reduce?'':`perspective(900px) translate3d(0,${-d*70}px,${-Math.abs(d)*160}px) rotateX(${d*28}deg)`; o.style.visibility=op<.01?'hidden':'visible';});
+    const ai=Math.round(sf); if(ai!==lastSeg){dots.forEach((d,i)=>d.classList.toggle('on',i===ai)); lastSeg=ai;}
+    renderer.render(scene,camera);
+  }};
+})();
+
+/* ================= ANELLI DI TESTO 3D ================= */
+const rings=[...document.querySelectorAll('.ring3d')].map(el=>{
+  const cyl=document.createElement('div'); cyl.className='cyl'; el.appendChild(cyl);
+  const cols=['--ink','--c2','--ink','--c1','--ink','--c3','--ink','--c4']; let wi=0;
+  const spans=[...el.dataset.text].map(ch=>{const sp=document.createElement('span'); sp.textContent=ch; if(ch==='·') wi++; sp.style.color=`var(${ch==='·'?'--dim':cols[(wi*2+1)%cols.length]})`; cyl.appendChild(sp); return sp;});
+  const r={el,cyl,spans,angles:[],vis:false};
+  function layout(){const ws=spans.map(sp=>sp.offsetWidth||20), C=ws.reduce((a,b)=>a+b,0), R=C/(2*Math.PI); let acc=0;
+    r.angles=ws.map(w=>{const a=(acc+w/2)/C*360; acc+=w; return a;});
+    spans.forEach((sp,i)=>sp.style.transform=`translate(-50%,-50%) rotateY(${r.angles[i]}deg) translateZ(${R}px)`);}
+  layout(); addEventListener('resize',layout); if(document.fonts) document.fonts.ready.then(layout);
+  new IntersectionObserver(es=>es.forEach(e=>r.vis=e.isIntersecting)).observe(el);
+  return r;});
+function ringFrame(now){rings.forEach((r,k)=>{if(!r.vis)return; const rot=-(scrollY*.14)-(reduce?0:now/1000*7)+k*40;
+  r.cyl.style.transform=`rotateX(-13deg) rotateY(${rot}deg)`;
+  r.spans.forEach((sp,i)=>{const c=Math.cos((r.angles[i]+rot)*Math.PI/180); sp.style.opacity=(.12+.88*Math.max(0,c)).toFixed(2);});});}
+
+/* ================= LETTERE ESTRUSE ================= */
+const x3ds=[...document.querySelectorAll('.x3d')].map(el=>{const st=document.createElement('div'); st.className='stack';
+  const LAY=18; for(let i=LAY;i>=0;i--){const sp=document.createElement('span'); sp.textContent=el.dataset.l; sp.style.transform=`translateZ(${-i*5}px)`;
+    if(i===0) sp.className='front'; else {const t=i/LAY; sp.style.color=`hsl(${226+t*14} ${62-t*25}% ${46-t*34}%)`;} st.appendChild(sp);}
+  el.appendChild(st); const o={el,st,vis:false}; new IntersectionObserver(es=>es.forEach(e=>o.vis=e.isIntersecting)).observe(el); return o;});
+function x3dFrame(){x3ds.forEach(o=>{if(!o.vis)return; const r=o.el.getBoundingClientRect(), pr=(r.top+r.height/2)/innerHeight-.5;
+  const ry=-30+mouse.sx*20+pr*40, rx=14-mouse.sy*12-pr*24; o.st.style.transform=`rotateY(${ry.toFixed(2)}deg) rotateX(${rx.toFixed(2)}deg)`;});}
+
+/* ================= TESTO ESTRUSO (ombre a strati) ================= */
+const extr=[...document.querySelectorAll('.extrude')]; let lastSh='';
+function extrudeFrame(){const dx=-mouse.sx*.9, dy=mouse.sy*.9+.6; const key=dx.toFixed(2)+dy.toFixed(2); if(key===lastSh)return; lastSh=key;
+  const L=[]; for(let i=1;i<=12;i++) L.push(`${(dx*i).toFixed(1)}px ${(dy*i).toFixed(1)}px 0 hsl(228 52% ${Math.max(6,40-i*2.8)}%)`);
+  L.push(`${(dx*20).toFixed(1)}px ${(dy*20+14).toFixed(1)}px 34px rgba(0,0,0,.55)`); const sh=L.join(',');
+  extr.forEach(e=>e.style.textShadow=sh);}
+
+/* ================= TILT, MAGNETI, TESSERE ================= */
+if(fine&&!reduce){
+  document.querySelectorAll('.card.lift:not(.st3d),.card.warn,.card.readout').forEach(c=>{c.classList.add('tilt');
+    c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+      const k=c.classList.contains('readout')?.35:1;
+      c.style.setProperty('--ry',((x-.5)*10*k).toFixed(2)+'deg'); c.style.setProperty('--rx',((.5-y)*8*k).toFixed(2)+'deg'); c.style.setProperty('--mx',x*100+'%'); c.style.setProperty('--my',y*100+'%');});
+    c.addEventListener('pointerleave',()=>{c.style.setProperty('--rx','0deg'); c.style.setProperty('--ry','0deg');});});
+  document.querySelectorAll('.btn').forEach(b=>{b.addEventListener('pointermove',e=>{const r=b.getBoundingClientRect(); b.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.25}px,${(e.clientY-r.top-r.height/2)*.35}px)`;});
+    b.addEventListener('pointerleave',()=>b.style.transform='');});
+}
+document.querySelectorAll('.flip').forEach(f=>{const t=()=>f.classList.toggle('on'); f.addEventListener('click',t); f.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();t();}});});
+
+/* ---------- loop ---------- */
+function frame(now){
+  mouse.sx=lerp(mouse.sx,fine?mouse.nx:0,.07); mouse.sy=lerp(mouse.sy,fine?mouse.ny:0,.07);
+  hero&&hero.frame(now); stages.forEach(s=>{if(s.visible) s.frame(now);});
+  ringFrame(now); x3dFrame(); extrudeFrame();
+  requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+
+/* ================= COREOGRAFIA ================= */
+function splitChars(el){const label=el.textContent.replace(/\s+/g,' ').trim(), chars=[];
+  (function walk(node){[...node.childNodes].forEach(ch=>{
+    if(ch.nodeType===3){const frag=document.createDocumentFragment();
+      ch.textContent.split(/(\s+)/).forEach(part=>{if(!part)return; if(/^\s+$/.test(part)){frag.appendChild(document.createTextNode(' '));return;}
+        const w=document.createElement('span'); w.className='w'; [...part].forEach(c=>{const sp=document.createElement('span'); sp.className='ch'; sp.textContent=c; w.appendChild(sp); chars.push(sp);}); frag.appendChild(w);});
+      ch.replaceWith(frag);}
+    else if(ch.nodeType===1) walk(ch);});})(el);
+  el.setAttribute('aria-label',label); [...el.children].forEach(c=>c.setAttribute('aria-hidden','true')); return chars;}
+
+function heroIn(){
+  heroIntro=performance.now();
+  if(!hasG||reduce){document.querySelectorAll('.hero3d h1 .ln').forEach(l=>l.classList.add('open'));return;}
+  gsap.timeline({defaults:{ease:'expo.out'}})
+    .from('.hero3d h1 .ln > span',{yPercent:115,rotateX:-60,transformPerspective:800,duration:1.4,stagger:.12,onComplete:()=>document.querySelectorAll('.hero3d h1 .ln').forEach(l=>l.classList.add('open'))},.2)
+    .from('.ov0 .eyebrow',{y:16,opacity:0,duration:1},.1)
+    .from('.ov0 > :not(h1):not(.eyebrow)',{y:30,opacity:0,duration:1.1,stagger:.1},.6)
+    .from('nav.top',{yPercent:-100,duration:1.1},.3);
+}
+if(hasG&&!reduce){
+  const cur=document.createElement('div'); cur.setAttribute('aria-hidden','true');
+  cur.style.cssText='position:fixed;inset:0;z-index:200;display:grid;place-items:center;pointer-events:none';
+  cur.innerHTML='<div style="position:absolute;left:0;right:0;top:0;height:50.5%;background:#0B1022" class="pt"></div><div style="position:absolute;left:0;right:0;bottom:0;height:50.5%;background:#0B1022" class="pb"></div><div class="cnt" style="position:relative;display:grid;justify-items:center;gap:10px"><b style="font-family:var(--f-display);font-weight:400;font-size:clamp(5rem,16vw,12rem);line-height:.85">0</b><span class="eyebrow">Statistica descrittiva · carico i dati</span></div>';
+  document.body.appendChild(cur);
+  const num=cur.querySelector('b'), o={v:0};
+  gsap.timeline()
+    .to(o,{v:40,duration:1.3,ease:'power2.inOut',onUpdate:()=>num.textContent=Math.round(o.v)+' / 40'},0)
+    .to(cur.querySelector('.cnt'),{rotateX:80,y:-40,opacity:0,transformPerspective:700,duration:.6,ease:'power2.in'},1.45)
+    .add(heroIn,1.65)
+    .to(cur.querySelector('.pt'),{yPercent:-100,duration:1.1,ease:'expo.inOut'},1.6)
+    .to(cur.querySelector('.pb'),{yPercent:100,duration:1.1,ease:'expo.inOut'},1.6)
+    .add(()=>cur.remove());
+  setTimeout(()=>{if(cur.isConnected){cur.remove(); if(heroIntro===null) heroIn();}},5000);
+} else heroIn();
+
+if(hasG&&window.ScrollTrigger&&!reduce){
+  const below=el=>el.getBoundingClientRect().top>innerHeight;
+  // blocchi: entrano ribaltandosi in prospettiva
+  gsap.utils.toArray('.rv').forEach(el=>{if(below(el)) gsap.set(el,{rotateX:-28,y:80,z:-140,transformPerspective:1000,transformOrigin:'50% 0%',opacity:.12});});
+  ScrollTrigger.batch('.rv',{start:'top 92%',once:true,onEnter:b=>gsap.to(b,{rotateX:0,y:0,z:0,opacity:1,duration:1.3,stagger:.09,ease:'expo.out',clearProps:'transform,opacity'})});
+  // titoli: lettere che si ribaltano
+  document.querySelectorAll('.split').forEach(hd=>{const chars=splitChars(hd);
+    if(below(hd)) gsap.set(chars,{rotateX:-100,y:24,opacity:.06});
+    ScrollTrigger.create({trigger:hd,start:'top 88%',once:true,onEnter:()=>gsap.to(chars,{rotateX:0,y:0,opacity:1,duration:1.3,stagger:.026,ease:'expo.out'})});});
+  // scale di card in 3D (percorso, riepilogo)
+  [...new Set([...document.querySelectorAll('.st3d')].map(c=>c.parentElement))].forEach(box=>{
+    gsap.fromTo(box.children,{rotateY:-42,rotateX:24,z:-320,y:140,transformPerspective:1100,opacity:.15},
+      {rotateY:0,rotateX:0,z:0,y:0,opacity:1,stagger:.14,ease:'none',scrollTrigger:{trigger:box,start:'top 98%',end:'top 38%',scrub:1}});});
+  // laboratori: si alzano come uno schermo
+  gsap.utils.toArray('.s3d').forEach(st=>gsap.fromTo(st,{rotateX:26,scale:.84,transformPerspective:1400},{rotateX:0,scale:1,ease:'none',scrollTrigger:{trigger:st,start:'top bottom',end:'top 32%',scrub:1}}));
+  // righe di tabella che si ribaltano
+  gsap.utils.toArray('.tbl tbody tr').forEach((tr,i)=>{const cells=tr.children; if(below(tr)) gsap.set(cells,{rotateX:-90,transformPerspective:700,transformOrigin:'50% 0%',opacity:.1});
+    ScrollTrigger.create({trigger:tr,start:'top 94%',once:true,onEnter:()=>gsap.to(cells,{rotateX:0,opacity:1,duration:.9,stagger:.03,delay:(i%6)*.05,ease:'expo.out'})});});
+  // tessere simboli: entrano girando
+  gsap.from('.flip',{rotateY:180,opacity:0,duration:1.2,stagger:.08,ease:'expo.out',scrollTrigger:{trigger:'.sym',start:'top 88%',once:true}});
+  // footer
+  gsap.fromTo('footer .big',{rotateX:50,y:120,transformPerspective:900,transformOrigin:'50% 100%'},{rotateX:0,y:0,ease:'none',scrollTrigger:{trigger:'footer',start:'top bottom',end:'bottom bottom',scrub:1}});
+}
+})();
+</script>
+
+</body></html>
